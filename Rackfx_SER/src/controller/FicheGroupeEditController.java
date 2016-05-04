@@ -274,8 +274,6 @@ public class FicheGroupeEditController {
 	 * Méthode de mise à jour des entités enfants
 	 */
 	private void loadChildren() {
-//		personneData.setAll(CRUD.getAllWhere("Personne", "groupeId", groupe.getGroupeId()));
-//		titreData.setAll(CRUD.getAllWhere("Titre", "groupeId", groupe.getGroupeId()));
 		cmbox_membre.setItems(MainViewController.getInstance().personneData);
 		tbv_titre.setItems(MainViewController.getInstance().titreData);
 	}
