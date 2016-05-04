@@ -13,11 +13,6 @@ import java.util.ResourceBundle;
 
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -73,6 +68,8 @@ public final class MainViewController {
 	private Label vide1;
 	private Label vide2;
 	private Label vide3;
+	private int compteurAdmin = 0;
+	private int compteurUser = 0;
 
 	/* Singleton */
 	/** Instance unique pré-initialisée */
@@ -115,10 +112,18 @@ public final class MainViewController {
 		tv_admin.setItems(MainApp.getInstance().userData);
 
 		/* récupération du nombre d'utilisateurs et d'administrateurs */
-		lb_nb_admin.setText(String.valueOf(Crud.count("User", "droit_auth", "\'administrateur\'")));
-		lb_nb_user.setText(String.valueOf(Crud.count("User", "droit_auth", "\'utilisateur\'")));
-		lb_nb_total.setText(
-				String.valueOf(Integer.valueOf(lb_nb_admin.getText()) + Integer.valueOf(lb_nb_user.getText())));
+		countUser();
+		// for (User user : MainApp.getInstance().userData) {
+		// if (user.getDroit_auth().equals("administrateur")) {
+		// compteurAdmin++;
+		// } else {
+		// compteurUser++;
+		// }
+		// }
+		//
+		// lb_nb_admin.setText(String.valueOf(compteurAdmin));
+		// lb_nb_user.setText(String.valueOf(compteurUser));
+		// lb_nb_total.setText(String.valueOf(compteurAdmin + compteurUser));
 
 		/*
 		 * listener pour mettre à jour le nombre d'utilisateurs et
@@ -128,10 +133,7 @@ public final class MainViewController {
 
 			@Override
 			public void onChanged(javafx.collections.ListChangeListener.Change<? extends User> c) {
-				lb_nb_admin.setText(String.valueOf(Crud.count("User", "droit_auth", "\'administrateur\'")));
-				lb_nb_user.setText(String.valueOf(Crud.count("User", "droit_auth", "\'utilisateur\'")));
-				lb_nb_total.setText(
-						String.valueOf(Integer.valueOf(lb_nb_admin.getText()) + Integer.valueOf(lb_nb_user.getText())));
+				countUser();
 			}
 		});
 
@@ -485,6 +487,8 @@ public final class MainViewController {
 	private ImageView img_view_main;
 	private ObservableList<Representation> repreDataTri = FXCollections.observableArrayList();
 	private ObservableList<Rencontre> rencontreDataTri = FXCollections.observableArrayList();
+	private ObservableList<Personne> personneData = FXCollections.observableArrayList();
+	private ObservableList<Titre> titreData = FXCollections.observableArrayList();
 	private Date auj = new Date();
 	private Image imageOrigine = new Image("file:src/img/cd_music.png");
 
@@ -547,26 +551,43 @@ public final class MainViewController {
 		if (groupe != null) {
 			int rencontreDataF = 0;
 			int rencontreDataP = 0;
-			repreDataTri.setAll(Crud.getAllWhere("Representation", "groupeId", groupe.getGroupeId()));
-			for (Representation repreTri : repreDataTri) {
-				rencontreDataTri
-						.setAll(Crud.getAllWhere("Rencontre", "rencontreId", repreTri.getRencontre().getRencontreId()));
-
-				for (Rencontre rencTri : rencontreDataTri) {
-					if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
-						rencontreDataF++;
-					} else {
-						rencontreDataP++;
-					}
-				}
-			}
+			
 			lb_nom_groupe.setText(groupe.getNom_groupe());
 			lb_carac_groupe.setText(groupe.getCarac_groupe());
 			lb_pays_groupe.setText(groupe.getPays_groupe());
 			lb_region_groupe.setText(groupe.getRegion_groupe());
-			lb_nb_membre
-					.setText(String.valueOf(Crud.count("Personne", "groupeId", String.valueOf(groupe.getGroupeId()))));
-			lb_nb_titre.setText(String.valueOf(Crud.count("Titre", "groupeId", String.valueOf(groupe.getGroupeId()))));
+			
+			for (Groupe groupe2 : MainApp.getInstance().groupeData) {
+				for (Personne personne : groupe2.getListe_personne()) {
+					if (personne.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+						personneData.add(personne);
+					}
+				}
+				for (Titre titre : groupe2.getListe_titre()) {
+					if (titre.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+						titreData.add(titre);
+					}
+				}
+				for (Representation repre : groupe2.getListe_representation()) {
+					if (repre.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+						repreDataTri.add(repre);
+					}
+				}
+			}
+			lb_nb_membre.setText(String.valueOf(personneData.size()));
+			lb_nb_titre.setText(String.valueOf(titreData.size()));
+			
+			for (Representation repreTri : repreDataTri) {
+				rencontreDataTri.add(repreTri.getRencontre());
+			}
+			for (Rencontre rencTri : rencontreDataTri) {
+				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
+					rencontreDataF++;
+				} else {
+					rencontreDataP++;
+				}
+			}
+			
 			lb_nb_event_futur.setText(String.valueOf(rencontreDataF));
 			lb_nb_event_passe.setText(String.valueOf(rencontreDataP));
 			if (groupe.getImage() != null) {
@@ -669,16 +690,26 @@ public final class MainViewController {
 	 * labels de l'onglet planification de la fenetre principale.
 	 */
 	protected void showEventDetails(Rencontre rencontre) {
+		int nb = 0;
+		int nb2 = 0;
 		if (rencontre != null) {
 			lb_lieu.setText(rencontre.getLieu_renc());
 			lb_date_deb.setText(simpleFormat.format(rencontre.getDate_deb_renc()));
 			lb_date_fin.setText(simpleFormat.format(rencontre.getDate_fin_renc()));
 			lb_nb_pers.setText(rencontre.getNb_pers_attendues().toString());
 			lb_perio.setText(rencontre.getPeriodicite_renc());
-			lb_nb_orga.setText(String
-					.valueOf(Crud.count("Organisateur", "rencontreId", String.valueOf(rencontre.getRencontreId()))));
-			lb_nb_repre.setText(String
-					.valueOf(Crud.count("Representation", "rencontreId", String.valueOf(rencontre.getRencontreId()))));
+			for (Rencontre renc : MainApp.getInstance().rencontreData) {
+				for (Organisateur orga : renc.getListe_orga()) {
+					if (orga.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
+						lb_nb_orga.setText(String.valueOf(nb++));
+					}
+				}
+				for (Representation repre : renc.getListe_repre()) {
+					if (repre.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
+						lb_nb_repre.setText(String.valueOf(nb2++));
+					}
+				}
+			}
 		} else {
 			lb_lieu.setText("");
 			lb_date_deb.setText("");
@@ -717,6 +748,23 @@ public final class MainViewController {
 	private Label lb_nb_admin;
 	@FXML
 	private Label lb_nb_total;
+
+	/**
+	 * Récupération du nombre d'utilisateurs et d'administrateurs
+	 */
+	private void countUser() {
+		for (User user : MainApp.getInstance().userData) {
+			if (user.getDroit_auth().equals("administrateur")) {
+				compteurAdmin++;
+			} else {
+				compteurUser++;
+			}
+		}
+
+		lb_nb_admin.setText(String.valueOf(compteurAdmin));
+		lb_nb_user.setText(String.valueOf(compteurUser));
+		lb_nb_total.setText(String.valueOf(compteurAdmin + compteurUser));
+	}
 
 	/**
 	 * Methode executée lorsque l'utilisateur clique sur le bouton Créer.

@@ -15,6 +15,11 @@ public class Crud {
 	private static String localDirectory = "/home/anthony/Playground/";
 	private static String extentionSer = ".ser";
 
+	/**
+	 * Methode de serialisation d'objets
+	 * @param obj
+	 * @throws IOException
+	 */
 	public static <T> void Serialize(T obj) throws IOException {
 		ObjectOutputStream out = new ObjectOutputStream(
 				new FileOutputStream(localDirectory + obj.getClass().getName() + extentionSer));
@@ -23,6 +28,14 @@ public class Crud {
 		out.close();
 	}
 
+	/**
+	 * Methode de deserialisation d'objets
+	 * @param obj
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	@SuppressWarnings("unchecked")
 	public static <obj, T> ObservableList<T> Deserialize(Class<?> obj) throws IOException, ClassNotFoundException {
 		boolean endOfFile = false;
 		ObservableList<Object> rlist = FXCollections.observableArrayList();
