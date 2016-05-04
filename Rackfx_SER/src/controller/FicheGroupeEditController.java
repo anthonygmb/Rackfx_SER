@@ -38,7 +38,6 @@ import jfxtras.scene.control.LocalTimePicker;
 import model.Groupe;
 import model.Personne;
 import model.Rencontre;
-import model.Representation;
 import model.Titre;
 import utilities.Crud;
 import utilities.FileUtils;
@@ -60,8 +59,6 @@ public class FicheGroupeEditController {
 	private DateFormat formatAnnee = new SimpleDateFormat("yyyy");
 	private Date auj = new Date();
 	private String annee = "";
-	private ObservableList<Representation> repreDataTri = FXCollections.observableArrayList();
-	private ObservableList<Rencontre> rencontreDataTri = FXCollections.observableArrayList();
 	private Image imageOrigine;
 	private ResourceBundle Lang_bundle;
 	private Label vide1;
@@ -355,12 +352,12 @@ public class FicheGroupeEditController {
 			groupe.validateObject();
 			Crud.Serialize(groupe);
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouveau.groupe"))) {
-//				Crud.Serialize(groupe);
+				// Crud.Serialize(groupe);
 				geleTab(true);
 				MainApp.getInstance().groupeData.add(groupe);
 				MainViewController.getInstance().tv_reper.getSelectionModel().selectLast();
 			} else {
-//				Crud.Serialize(groupe);
+				// Crud.Serialize(groupe);
 				MainViewController.getInstance().showGroupeDetails(groupe);
 				int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
 				MainApp.getInstance().groupeData.setAll(Crud.Deserialize(Groupe.class));
@@ -859,9 +856,8 @@ public class FicheGroupeEditController {
 
 	@FXML
 	private Tab tab_event_f_groupe;
-	private ObservableList<Rencontre> rencontreDataF = FXCollections.observableArrayList();
 	@FXML
-	private TableView<Rencontre> tbv_event_f = new TableView<>(rencontreDataF);
+	private TableView<Rencontre> tbv_event_f = new TableView<>(MainViewController.getInstance().rencontreDataF);
 	@FXML
 	private TableColumn<Rencontre, String> col_event_event_f;
 	@FXML
@@ -876,22 +872,8 @@ public class FicheGroupeEditController {
 	 * d'événements futurs et passés
 	 */
 	private void loadRencontres() {
-		repreDataTri.setAll(CRUD.getAllWhere("Representation", "groupeId", groupe.getGroupeId()));
-
-		for (Representation repreTri : repreDataTri) {
-			rencontreDataTri
-					.setAll(CRUD.getAllWhere("Rencontre", "rencontreId", repreTri.getRencontre().getRencontreId()));
-
-			for (Rencontre rencTri : rencontreDataTri) {
-				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
-					rencontreDataF.setAll(rencTri);
-				} else {
-					rencontreDataP.setAll(rencTri);
-				}
-			}
-		}
-		tbv_event_f.setItems(rencontreDataF);
-		tbv_event_p.setItems(rencontreDataP);
+		tbv_event_f.setItems(MainViewController.getInstance().rencontreDataF);
+		tbv_event_p.setItems(MainViewController.getInstance().rencontreDataP);
 	}
 
 	/*
@@ -901,9 +883,8 @@ public class FicheGroupeEditController {
 
 	@FXML
 	private Tab tab_event_p_groupe;
-	private ObservableList<Rencontre> rencontreDataP = FXCollections.observableArrayList();
 	@FXML
-	private TableView<Rencontre> tbv_event_p = new TableView<>(rencontreDataP);
+	private TableView<Rencontre> tbv_event_p = new TableView<>(MainViewController.getInstance().rencontreDataP);
 	@FXML
 	private TableColumn<Rencontre, String> col_event_event_p;
 	@FXML

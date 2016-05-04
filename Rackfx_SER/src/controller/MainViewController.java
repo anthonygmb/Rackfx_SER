@@ -7,7 +7,6 @@ import java.security.NoSuchProviderException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -487,8 +486,10 @@ public final class MainViewController {
 	private ImageView img_view_main;
 	private ObservableList<Representation> repreDataTri = FXCollections.observableArrayList();
 	private ObservableList<Rencontre> rencontreDataTri = FXCollections.observableArrayList();
-	private ObservableList<Personne> personneData = FXCollections.observableArrayList();
-	private ObservableList<Titre> titreData = FXCollections.observableArrayList();
+	public ObservableList<Personne> personneData = FXCollections.observableArrayList();
+	public ObservableList<Titre> titreData = FXCollections.observableArrayList();
+	public ObservableList<Rencontre> rencontreDataF = FXCollections.observableArrayList();
+	public ObservableList<Rencontre> rencontreDataP = FXCollections.observableArrayList();
 	private Date auj = new Date();
 	private Image imageOrigine = new Image("file:src/img/cd_music.png");
 
@@ -549,8 +550,6 @@ public final class MainViewController {
 	 */
 	protected void showGroupeDetails(Groupe groupe) {
 		if (groupe != null) {
-			int rencontreDataF = 0;
-			int rencontreDataP = 0;
 			
 			lb_nom_groupe.setText(groupe.getNom_groupe());
 			lb_carac_groupe.setText(groupe.getCarac_groupe());
@@ -582,14 +581,14 @@ public final class MainViewController {
 			}
 			for (Rencontre rencTri : rencontreDataTri) {
 				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
-					rencontreDataF++;
+					rencontreDataF.add(rencTri);
 				} else {
-					rencontreDataP++;
+					rencontreDataP.add(rencTri);
 				}
 			}
 			
-			lb_nb_event_futur.setText(String.valueOf(rencontreDataF));
-			lb_nb_event_passe.setText(String.valueOf(rencontreDataP));
+			lb_nb_event_futur.setText(String.valueOf(rencontreDataF.size()));
+			lb_nb_event_passe.setText(String.valueOf(rencontreDataP.size()));
 			if (groupe.getImage() != null) {
 				img_view_main.setImage(FileUtils.convertByteToImage(groupe.getImage()));
 			} else {
@@ -637,6 +636,8 @@ public final class MainViewController {
 	@FXML
 	private Label lb_nb_repre;
 	private SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy");
+	public ObservableList<Organisateur> personneData = FXCollections.observableArrayList();
+	public ObservableList<Representation> titreData = FXCollections.observableArrayList();
 
 	/**
 	 * Appelé quand l'utilisateur clique sur le bouton Nouveau de l'onglet

@@ -277,7 +277,7 @@ public class FicheEventEditController {
 	 * Méthode de mise à jour des entités enfants
 	 */
 	private void loadChildren() {
-		orgaData.setAll(Crud.getAllWhere("Organisateur", "rencontreId", rencontre.getRencontreId()));
+		orgaData.setAll(MainViewController.getInstance().or));
 		repreData.setAll(Crud.getAllWhere("Representation", "rencontreId", rencontre.getRencontreId()));
 		cmbox_orga.setItems(orgaData);
 		tbv_prog.setItems(repreData);
