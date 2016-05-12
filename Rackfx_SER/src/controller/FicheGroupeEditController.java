@@ -350,26 +350,26 @@ public class FicheGroupeEditController {
 		}
 		try {
 			groupe.validateObject();
-			Crud.Serialize(groupe);
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouveau.groupe"))) {
-				// Crud.Serialize(groupe);
 				geleTab(true);
 				MainApp.getInstance().groupeData.add(groupe);
 				MainViewController.getInstance().tv_reper.getSelectionModel().selectLast();
 			} else {
-				// Crud.Serialize(groupe);
 				MainViewController.getInstance().showGroupeDetails(groupe);
 				int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-				MainApp.getInstance().groupeData.setAll(Crud.Deserialize(Groupe.class));
+				MainApp.getInstance().groupeData.set(index, groupe);
 				MainViewController.getInstance().tv_reper.getSelectionModel().select(index);
 			}
+			Crud.Serialize(MainApp.getInstance().groupeData);
 			dialogStage.setTitle(groupe.getNom_groupe());
 			btn_creer_groupe.setText(Lang_bundle.getString("Appliquer"));
 			loadChildren();
 		} catch (InvalidObjectException e) { /* si la validation a échoué */
 			// TODO
-		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO
+			e.printStackTrace();
 		}
 	}
 
@@ -631,12 +631,11 @@ public class FicheGroupeEditController {
 			if (cmbox_membre.getSelectionModel().getSelectedItem() == null) {
 				personne.setGroupe(groupe);
 				groupe.getListe_personne().add(personne);
-				Crud.Serialize(personne);
 				cmbox_membre.getItems().add(personne);
 			} else {
-				Crud.Serialize(personne);
 				cmbox_membre.getItems().set(cmbox_membre.getSelectionModel().getSelectedIndex(), personne);
 			}
+			Crud.Serialize(cmbox_membre.getItems());
 			annulerPersonne();
 		} catch (InvalidObjectException e) {
 			// TODO Auto-generated catch block
@@ -680,6 +679,12 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.membre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
 			cmbox_membre.getItems().remove(cmbox_membre.getSelectionModel().getSelectedItem());
+			try {
+				Crud.Serialize(cmbox_membre.getItems());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			annulerPersonne();
 		}
 	}
@@ -800,12 +805,11 @@ public class FicheGroupeEditController {
 			if (tbv_titre.getSelectionModel().getSelectedItem() == null) {
 				titre.setGroupe(groupe);
 				groupe.getListe_titre().add(titre);
-				Crud.Serialize(titre);
 				tbv_titre.getItems().add(titre);
 			} else {
-				Crud.Serialize(titre);
 				tbv_titre.getItems().set(tbv_titre.getSelectionModel().getSelectedIndex(), titre);
 			}
+			Crud.Serialize(tbv_titre.getItems());
 			annulerTitre();
 		} catch (InvalidObjectException e) {
 			// TODO Auto-generated catch block
@@ -845,6 +849,12 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.titre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
 			tbv_titre.getItems().remove(tbv_titre.getSelectionModel().getSelectedItem());
+			try {
+				Crud.Serialize(tbv_titre.getItems());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			annulerTitre();
 		}
 	}

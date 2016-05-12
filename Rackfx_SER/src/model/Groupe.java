@@ -12,7 +12,8 @@ import javafx.beans.property.StringProperty;
 public class Groupe implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = 2167626103464193289L;
-	private StringProperty nom_groupe;
+	private String nom_groupe;
+	private transient StringProperty nom_groupeProp;
 	private String carac_groupe;
 	private String pays_groupe;
 	private String region_groupe;
@@ -26,7 +27,7 @@ public class Groupe implements Serializable, ObjectInputValidation {
 	}
 
 	public Groupe(String nomGroupe, String carac_groupe, String pays_groupe, String region_groupe) {
-		this.nom_groupe = new SimpleStringProperty(nomGroupe);
+		this.nom_groupe = nomGroupe;
 		this.carac_groupe = carac_groupe;
 		this.pays_groupe = pays_groupe;
 		this.region_groupe = region_groupe;
@@ -34,15 +35,16 @@ public class Groupe implements Serializable, ObjectInputValidation {
 
 	// =================================================================================================
 	public String getNom_groupe() {
-		return nom_groupe.get();
+		return nom_groupe;
 	}
 
 	public void setNom_groupe(String nom_groupe) {
-		this.nom_groupe.set(nom_groupe);
+		this.nom_groupe = nom_groupe;
+		this.nom_groupeProp = new SimpleStringProperty(nom_groupe);
 	}
 
 	public final StringProperty nom_groupeProperty() {
-		return nom_groupe;
+		return nom_groupeProp;
 	}
 
 	// =================================================================================================

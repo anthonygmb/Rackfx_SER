@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -16,13 +15,10 @@ import org.controlsfx.control.textfield.CustomTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
@@ -34,7 +30,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import model.Groupe;
 import model.Organisateur;
 import model.Parametres;
@@ -100,12 +95,16 @@ public final class MainViewController {
 
 		this.Lang_bundle = MainApp.getInstance().Lang_bundle;
 
-		Session s = HibernateSetUp.getSession();
-		FullTextSession fullTextSession = Search.getFullTextSession(s);
-		fullTextSession.createIndexer().startAndWait();
-		fullTextSession.close();
+//		Session s = HibernateSetUp.getSession();
+//		FullTextSession fullTextSession = Search.getFullTextSession(s);
+//		fullTextSession.createIndexer().startAndWait();
+//		fullTextSession.close();
 
 		/* récupération des listes de groupes, de rencontres et de users */
+		for (Groupe groupe : MainApp.getInstance().groupeData) {
+			groupe.setNom_groupe(groupe.getNom_groupe());
+		}
+		
 		tv_reper.setItems(MainApp.getInstance().groupeData);
 		tv_planif.setItems(MainApp.getInstance().rencontreData);
 		tv_admin.setItems(MainApp.getInstance().userData);
@@ -322,7 +321,7 @@ public final class MainViewController {
 		vb_link.getChildren().clear();
 
 		if (!cst_tf_search.getText().equals("")) {
-			try {
+		/*	try {
 				Session s = HibernateSetUp.getSession();
 				FullTextSession fullTextSession = Search.getFullTextSession(s);
 				Transaction tx = fullTextSession.beginTransaction();
@@ -448,8 +447,8 @@ public final class MainViewController {
 				tx.commit();
 				s.close();
 			} catch (Exception e) {
-				/* Ommition de l'erreur de recherche sur un seul caractère */
-			}
+			// ommition de la recherche a vide
+			}*/
 		}
 	}
 
@@ -500,10 +499,9 @@ public final class MainViewController {
 	 * <code>getGroupeData</code> Sauve le groupe en base de donnée via
 	 * Hibernate.
 	 * 
-	 * @throws SQLException
 	 */
 	@FXML
-	private void nouveauGroupe() throws SQLException {
+	private void nouveauGroupe() {
 		Groupe tempGroupe = new Groupe();
 		MainApp.getInstance().showFicheGroupeEditDialog(tempGroupe, false, 0);
 	}
@@ -532,15 +530,20 @@ public final class MainViewController {
 	 * repertoire de la fenetre principale. Necessite de selectionner un groupe
 	 * dans la liste de groupes autrement un message d'erreur apparait.
 	 * 
-	 * @throws SQLException
 	 */
 	@FXML
-	private void supprimerGroupe() throws SQLException {
+	private void supprimerGroupe() {
 		result = Validateur.showPopup(AlertType.CONFIRMATION, Lang_bundle.getString("Confirmation.d'action"),
 				Lang_bundle.getString("Confirmation.de.suppression"), Lang_bundle.getString("Confirmation.groupe.supp"))
 				.showAndWait();
 		if (result.get() == ButtonType.OK) {
 			tv_reper.getItems().remove(tv_reper.getSelectionModel().getSelectedIndex());
+			try {
+				Crud.Serialize(tv_reper.getItems());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -549,6 +552,13 @@ public final class MainViewController {
 	 * les labels de l'onglet repertoire de la fenetre principale.
 	 */
 	protected void showGroupeDetails(Groupe groupe) {
+		personneData.clear();
+		titreData.clear();
+		repreDataTri.clear();
+		rencontreDataTri.clear();
+		rencontreDataF.clear();
+		rencontreDataP.clear();
+		
 		if (groupe != null) {
 			
 			lb_nom_groupe.setText(groupe.getNom_groupe());
@@ -556,23 +566,21 @@ public final class MainViewController {
 			lb_pays_groupe.setText(groupe.getPays_groupe());
 			lb_region_groupe.setText(groupe.getRegion_groupe());
 			
-			for (Groupe groupe2 : MainApp.getInstance().groupeData) {
-				for (Personne personne : groupe2.getListe_personne()) {
-					if (personne.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+				for (Personne personne : groupe.getListe_personne()) {
+					if (personne.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
 						personneData.add(personne);
 					}
 				}
-				for (Titre titre : groupe2.getListe_titre()) {
-					if (titre.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+				for (Titre titre : groupe.getListe_titre()) {
+					if (titre.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
 						titreData.add(titre);
 					}
 				}
-				for (Representation repre : groupe2.getListe_representation()) {
-					if (repre.getGroupe().getNom_groupe().equals(groupe2.getNom_groupe())) {
+				for (Representation repre : groupe.getListe_representation()) {
+					if (repre.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
 						repreDataTri.add(repre);
 					}
 				}
-			}
 			lb_nb_membre.setText(String.valueOf(personneData.size()));
 			lb_nb_titre.setText(String.valueOf(titreData.size()));
 			
@@ -636,8 +644,8 @@ public final class MainViewController {
 	@FXML
 	private Label lb_nb_repre;
 	private SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy");
-	public ObservableList<Organisateur> personneData = FXCollections.observableArrayList();
-	public ObservableList<Representation> titreData = FXCollections.observableArrayList();
+	public ObservableList<Organisateur> orgaData = FXCollections.observableArrayList();
+	public ObservableList<Representation> repreData = FXCollections.observableArrayList();
 
 	/**
 	 * Appelé quand l'utilisateur clique sur le bouton Nouveau de l'onglet
@@ -683,6 +691,12 @@ public final class MainViewController {
 				Lang_bundle.getString("Confirmation.rencontre.supp")).showAndWait();
 		if (result.get() == ButtonType.OK) {
 			tv_planif.getItems().remove(tv_planif.getSelectionModel().getSelectedIndex());
+			try {
+				Crud.Serialize(tv_planif.getItems());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -691,8 +705,6 @@ public final class MainViewController {
 	 * labels de l'onglet planification de la fenetre principale.
 	 */
 	protected void showEventDetails(Rencontre rencontre) {
-		int nb = 0;
-		int nb2 = 0;
 		if (rencontre != null) {
 			lb_lieu.setText(rencontre.getLieu_renc());
 			lb_date_deb.setText(simpleFormat.format(rencontre.getDate_deb_renc()));
@@ -702,15 +714,17 @@ public final class MainViewController {
 			for (Rencontre renc : MainApp.getInstance().rencontreData) {
 				for (Organisateur orga : renc.getListe_orga()) {
 					if (orga.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
-						lb_nb_orga.setText(String.valueOf(nb++));
+						orgaData.add(orga);
 					}
 				}
 				for (Representation repre : renc.getListe_repre()) {
 					if (repre.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
-						lb_nb_repre.setText(String.valueOf(nb2++));
+						repreData.add(repre);
 					}
 				}
 			}
+			lb_nb_orga.setText(String.valueOf(orgaData.size()));
+			lb_nb_repre.setText(String.valueOf(repreData.size()));
 		} else {
 			lb_lieu.setText("");
 			lb_date_deb.setText("");
@@ -782,9 +796,9 @@ public final class MainViewController {
 			user.setDroit_auth("utilisateur");
 		}
 		try {
-			user.validateObject();
-			Crud.Serialize(user);
+			user.validateObject();	
 			tv_admin.getItems().add(user);
+			Crud.Serialize(tv_admin.getItems());
 			annulerUser();
 		} catch (InvalidObjectException e) {
 			// TODO Auto-generated catch block
@@ -820,8 +834,8 @@ public final class MainViewController {
 					Lang_bundle.getString("Confirmation.de.suppression"), Lang_bundle.getString("Login.deja.utilise"))
 					.showAndWait();
 			if (result.get() == ButtonType.OK) {
-				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
-				annulerUser();
+//				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
+//				annulerUser();
 				deconnection();
 			}
 		} else {
@@ -829,9 +843,18 @@ public final class MainViewController {
 					Lang_bundle.getString("Confirmation.de.suppression"),
 					Lang_bundle.getString("Voulez-vous.supprimer.utilisateur.?")).showAndWait();
 			if (result.get() == ButtonType.OK) {
-				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
-				annulerUser();
+//				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
+//				annulerUser();
 			}
+		}
+		
+		tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
+		annulerUser();
+		try {
+			Crud.Serialize(tv_admin.getItems());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

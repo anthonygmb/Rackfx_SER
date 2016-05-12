@@ -15,11 +15,15 @@ import javafx.beans.property.StringProperty;
 public class Rencontre implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = -7356427739580246970L;
-	private StringProperty nom_renc;
-	private StringProperty ville_renc;
+	private String nom_renc;
+	private String ville_renc;
+	private transient StringProperty nom_rencProp;
+	private transient StringProperty ville_rencProp;
 	private String lieu_renc;
-	private ObjectProperty<Date> date_deb_renc;
-	private ObjectProperty<Date> date_fin_renc;
+	private Date date_deb_renc;
+	private Date date_fin_renc;
+	private transient ObjectProperty<Date> date_deb_rencProp;
+	private transient ObjectProperty<Date> date_fin_rencProp;
 	private String periodicite_renc;
 	private Long nb_pers_attendues;
 	private Set<Organisateur> liste_orga = new HashSet<Organisateur>();
@@ -31,39 +35,41 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 
 	public Rencontre(String nom_renc, String ville_renc, String lieu_renc, Date date_deb_renc, Date date_fin_renc,
 			String periodicite_renc, long nb_pers_attendues) {
-		this.nom_renc = new SimpleStringProperty(nom_renc);
-		this.ville_renc = new SimpleStringProperty(ville_renc);
+		this.nom_renc = nom_renc;
+		this.ville_renc = ville_renc;
 		this.lieu_renc = lieu_renc;
-		this.date_deb_renc = new SimpleObjectProperty<Date>(date_deb_renc);
-		this.date_fin_renc = new SimpleObjectProperty<Date>(date_fin_renc);
+		this.date_deb_renc = date_deb_renc;
+		this.date_fin_renc = date_fin_renc;
 		this.periodicite_renc = periodicite_renc;
 		this.nb_pers_attendues = nb_pers_attendues;
 	}
 
 	// =================================================================================================
 	public String getNom_renc() {
-		return nom_renc.get();
+		return nom_renc;
 	}
 
 	public void setNom_renc(String nom_renc) {
-		this.nom_renc.set(nom_renc);
+		this.nom_renc = nom_renc;
+		this.nom_rencProp = new SimpleStringProperty(nom_renc);
 	}
 
 	public StringProperty nom_rencProperty() {
-		return nom_renc;
+		return nom_rencProp;
 	}
 
 	// =================================================================================================
 	public String getVille_renc() {
-		return ville_renc.get();
+		return ville_renc;
 	}
 
 	public void setVille_renc(String ville_renc) {
-		this.ville_renc.set(ville_renc);
+		this.ville_renc = ville_renc;
+		this.ville_rencProp = new SimpleStringProperty(ville_renc);
 	}
 
 	public StringProperty ville_rencProperty() {
-		return ville_renc;
+		return ville_rencProp;
 	}
 
 	// =================================================================================================
@@ -77,28 +83,30 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 
 	// =================================================================================================
 	public Date getDate_deb_renc() {
-		return date_deb_renc.get();
+		return date_deb_renc;
 	}
 
 	public void setDate_deb_renc(Date date_deb_renc) {
-		this.date_deb_renc.set(date_deb_renc);
+		this.date_deb_renc = date_deb_renc;
+		this.date_deb_rencProp = new SimpleObjectProperty<Date>(date_deb_renc);
 	}
 
 	public ObjectProperty<Date> date_deb_rencProperty() {
-		return date_deb_renc;
+		return date_deb_rencProp;
 	}
 
 	// =================================================================================================
 	public Date getDate_fin_renc() {
-		return date_fin_renc.get();
+		return date_fin_renc;
 	}
 
 	public void setDate_fin_renc(Date date_fin_renc) {
-		this.date_fin_renc.set(date_fin_renc);
+		this.date_fin_renc = date_fin_renc;
+		this.date_fin_rencProp = new SimpleObjectProperty<Date>(date_fin_renc);
 	}
 
 	public ObjectProperty<Date> date_fin_rencProperty() {
-		return date_fin_renc;
+		return date_fin_rencProp;
 	}
 
 	// =================================================================================================

@@ -13,10 +13,14 @@ import javafx.beans.property.StringProperty;
 public class Representation implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = -3784241360835211682L;
-	private ObjectProperty<Time> heure_debut;
-	private ObjectProperty<Time> heure_fin;
-	private StringProperty nom_groupe;
-	private StringProperty nom_titre;
+	private Time heure_debut;
+	private Time heure_fin;
+	private String nom_groupe;
+	private String nom_titre;
+	private transient ObjectProperty<Time> heure_debutProp;
+	private transient ObjectProperty<Time> heure_finProp;
+	private transient StringProperty nom_groupeProp;
+	private transient StringProperty nom_titreProp;
 	private Rencontre rencontre;
 	private Groupe groupe;
 
@@ -25,62 +29,66 @@ public class Representation implements Serializable, ObjectInputValidation {
 	}
 
 	public Representation(String nom_groupe, String nom_titre, Time heure_debut, Time heure_fin) {
-		this.nom_groupe = new SimpleStringProperty(nom_groupe);
-		this.nom_titre = new SimpleStringProperty(nom_titre);
-		this.heure_debut = new SimpleObjectProperty<Time>(heure_debut);
-		this.heure_fin = new SimpleObjectProperty<Time>(heure_fin);
+		this.nom_groupe = nom_groupe;
+		this.nom_titre = nom_titre;
+		this.heure_debut = heure_debut;
+		this.heure_fin = heure_fin;
 	}
 
 	// =================================================================================================
 	public Time getHeure_debut() {
-		return heure_debut.get();
+		return heure_debut;
 	}
 
 	public void setHeure_debut(Time heure_debut) {
-		this.heure_debut.set(heure_debut);
+		this.heure_debut = heure_debut;
+		this.heure_debutProp = new SimpleObjectProperty<Time>(heure_debut);
 	}
 
 	public ObjectProperty<Time> heure_debutProperty() {
-		return heure_debut;
+		return heure_debutProp;
 	}
 
 	// =================================================================================================
 	public Time getHeure_fin() {
-		return heure_fin.get();
+		return heure_fin;
 	}
 
 	public void setHeure_fin(Time heure_fin) {
-		this.heure_fin.set(heure_fin);
+		this.heure_fin = heure_fin;
+		this.heure_finProp = new SimpleObjectProperty<Time>(heure_fin);
 	}
 
 	public ObjectProperty<Time> heure_fintProperty() {
-		return heure_fin;
+		return heure_finProp;
 	}
 
 	// =================================================================================================
 	public String getNom_Groupe() {
-		return nom_groupe.get();
+		return nom_groupe;
 	}
 
 	public void setNom_Groupe(String nom_groupe) {
-		this.nom_groupe.set(nom_groupe);
+		this.nom_groupe = nom_groupe;
+		this.nom_groupeProp = new SimpleStringProperty(nom_groupe);
 	}
 
 	public StringProperty nom_groupeProperty() {
-		return nom_groupe;
+		return nom_groupeProp;
 	}
 
 	// =================================================================================================
 	public String getNom_Titre() {
-		return nom_titre.get();
+		return nom_titre;
 	}
 
 	public void setNom_Titre(String nom_titre) {
-		this.nom_titre.set(nom_titre);
+		this.nom_titre = nom_titre;
+		this.nom_titreProp = new SimpleStringProperty(nom_titre);
 	}
 
 	public StringProperty nom_titreProperty() {
-		return nom_titre;
+		return nom_titreProp;
 	}
 
 	// =================================================================================================

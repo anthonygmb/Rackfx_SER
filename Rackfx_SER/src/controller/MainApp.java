@@ -54,7 +54,7 @@ public final class MainApp extends Application {
 			userData.addAll(Crud.Deserialize(User.class));
 			parametresData.addAll(Crud.Deserialize(Parametres.class));
 		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
+			System.out.printf("Première sérialisation");
 		}
 
 		if (parametresData.isEmpty()) {
