@@ -2,10 +2,11 @@ package controller;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.util.ResourceBundle;
 
 import org.controlsfx.control.ToggleSwitch;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
@@ -21,7 +22,6 @@ public class LangueController {
 	private ToggleSwitch ts_theme;
 	private Parametres param;
 	private Stage dialogStage;
-	private ResourceBundle Lang_bundle;
 
 	/* Singleton */
 	/** Instance unique pré-initialisée */
@@ -35,7 +35,6 @@ public class LangueController {
 	@FXML
 	private void initialize() {
 		INSTANCE_LANG_CONTROLLER = this;
-		this.Lang_bundle = MainApp.getInstance().Lang_bundle;
 		MainViewController.getInstance().lang_modif = false;
 		langue_cmbbox.getItems().addAll(Res_listes.liste_langues);
 	}
@@ -81,6 +80,8 @@ public class LangueController {
 	 */
 	@FXML
 	private void validerlangue() {
+		ObservableList<Parametres> paramData = FXCollections.observableArrayList();
+
 		param.setLangue(langue_cmbbox.getSelectionModel().getSelectedItem());
 		if (ts_theme.isSelected()) {
 			param.setTheme("Dark");
@@ -94,7 +95,8 @@ public class LangueController {
 			} else {
 				MainApp.getInstance().parametresData.set(0, param);
 			}
-			Crud.Serialize(param);
+			paramData.add(param);
+			Crud.Serialize(paramData);
 			MainViewController.getInstance().lang_modif = true;
 			dialogStage.close();
 		} catch (InvalidObjectException e) {

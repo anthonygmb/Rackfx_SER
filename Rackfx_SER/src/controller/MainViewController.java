@@ -31,12 +31,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import model.Groupe;
-import model.Organisateur;
 import model.Parametres;
-import model.Personne;
 import model.Rencontre;
 import model.Representation;
-import model.Titre;
 import model.User;
 import utilities.Crud;
 import utilities.CryptEtDecrypt;
@@ -95,33 +92,28 @@ public final class MainViewController {
 
 		this.Lang_bundle = MainApp.getInstance().Lang_bundle;
 
-//		Session s = HibernateSetUp.getSession();
-//		FullTextSession fullTextSession = Search.getFullTextSession(s);
-//		fullTextSession.createIndexer().startAndWait();
-//		fullTextSession.close();
+		// Session s = HibernateSetUp.getSession();
+		// FullTextSession fullTextSession = Search.getFullTextSession(s);
+		// fullTextSession.createIndexer().startAndWait();
+		// fullTextSession.close();
 
 		/* récupération des listes de groupes, de rencontres et de users */
 		for (Groupe groupe : MainApp.getInstance().groupeData) {
 			groupe.setNom_groupe(groupe.getNom_groupe());
 		}
-		
+		for (Rencontre rencontre : MainApp.getInstance().rencontreData) {
+			rencontre.setNom_renc(rencontre.getNom_renc());
+		}
+		for (User user : MainApp.getInstance().userData) {
+			user.setLogin(user.getLogin());
+		}
+
 		tv_reper.setItems(MainApp.getInstance().groupeData);
 		tv_planif.setItems(MainApp.getInstance().rencontreData);
 		tv_admin.setItems(MainApp.getInstance().userData);
 
 		/* récupération du nombre d'utilisateurs et d'administrateurs */
 		countUser();
-		// for (User user : MainApp.getInstance().userData) {
-		// if (user.getDroit_auth().equals("administrateur")) {
-		// compteurAdmin++;
-		// } else {
-		// compteurUser++;
-		// }
-		// }
-		//
-		// lb_nb_admin.setText(String.valueOf(compteurAdmin));
-		// lb_nb_user.setText(String.valueOf(compteurUser));
-		// lb_nb_total.setText(String.valueOf(compteurAdmin + compteurUser));
 
 		/*
 		 * listener pour mettre à jour le nombre d'utilisateurs et
@@ -321,134 +313,127 @@ public final class MainViewController {
 		vb_link.getChildren().clear();
 
 		if (!cst_tf_search.getText().equals("")) {
-		/*	try {
-				Session s = HibernateSetUp.getSession();
-				FullTextSession fullTextSession = Search.getFullTextSession(s);
-				Transaction tx = fullTextSession.beginTransaction();
-
-				QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Groupe.class).get();
-				org.apache.lucene.search.Query query = qb.keyword().onFields("nom_groupe")
-						.matching(cst_tf_search.getText()).createQuery();
-				org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Groupe.class);
-				@SuppressWarnings("unchecked")
-				List<Groupe> result1 = hibQuery.list();
-
-				qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Personne.class).get();
-				query = qb.keyword().onFields("nom_membre", "prenom_membre").matching(cst_tf_search.getText())
-						.createQuery();
-				hibQuery = fullTextSession.createFullTextQuery(query, Personne.class);
-				@SuppressWarnings("unchecked")
-				List<Personne> result2 = hibQuery.list();
-
-				qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Titre.class).get();
-				query = qb.keyword().onFields("titre", "annee").matching(cst_tf_search.getText()).createQuery();
-				hibQuery = fullTextSession.createFullTextQuery(query, Titre.class);
-				@SuppressWarnings("unchecked")
-				List<Titre> result3 = hibQuery.list();
-
-				qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Rencontre.class).get();
-				query = qb.keyword().onFields("nom_renc", "ville_renc", "periodicite_renc")
-						.matching(cst_tf_search.getText()).createQuery();
-				hibQuery = fullTextSession.createFullTextQuery(query, Rencontre.class);
-				@SuppressWarnings("unchecked")
-				List<Rencontre> result4 = hibQuery.list();
-
-				qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Organisateur.class).get();
-				query = qb.keyword().onFields("nom_orga", "prenom_orga", "entreprise_orga")
-						.matching(cst_tf_search.getText()).createQuery();
-				hibQuery = fullTextSession.createFullTextQuery(query, Organisateur.class);
-				@SuppressWarnings("unchecked")
-				List<Organisateur> result5 = hibQuery.list();
-
-				if (!result1.isEmpty()) {
-					Label ctgr_groupe = new Label(Lang_bundle.getString("Ctgr.groupe"));
-					vb_link.getChildren().add(ctgr_groupe);
-					for (Groupe groupe : result1) {
-						Hyperlink link_groupe = new Hyperlink(groupe.getNom_groupe());
-						link_groupe.setOnAction(new EventHandler<ActionEvent>() {
-
-							@Override
-							public void handle(ActionEvent event) {
-								MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 0);
-							}
-						});
-						vb_link.getChildren().add(link_groupe);
-					}
-				}
-				if (!result2.isEmpty()) {
-					Line ligne = new Line(0, 0, 588, 0);
-					Label ctgr_personne = new Label(Lang_bundle.getString("Ctgr.personne"));
-					vb_link.getChildren().add(ligne);
-					vb_link.getChildren().add(ctgr_personne);
-					for (Personne personne : result2) {
-						Hyperlink link_personne = new Hyperlink(personne.getNom_membre());
-						link_personne.setOnAction(new EventHandler<ActionEvent>() {
-
-							@Override
-							public void handle(ActionEvent event) {
-								MainApp.getInstance().showFicheGroupeEditDialog(personne.getGroupe(), true, 1);
-							}
-						});
-						vb_link.getChildren().add(link_personne);
-					}
-				}
-				if (!result3.isEmpty()) {
-					Line ligne = new Line(0, 0, 588, 0);
-					Label ctgr_titre = new Label(Lang_bundle.getString("Ctgr.titre"));
-					vb_link.getChildren().add(ligne);
-					vb_link.getChildren().add(ctgr_titre);
-					for (Titre titre : result3) {
-						Hyperlink link_titre = new Hyperlink(titre.getTitre());
-						link_titre.setOnAction(new EventHandler<ActionEvent>() {
-
-							@Override
-							public void handle(ActionEvent event) {
-								MainApp.getInstance().showFicheGroupeEditDialog(titre.getGroupe(), true, 2);
-							}
-						});
-						vb_link.getChildren().add(link_titre);
-					}
-				}
-				if (!result4.isEmpty()) {
-					Line ligne = new Line(0, 0, 588, 0);
-					Label ctgr_rencontre = new Label(Lang_bundle.getString("Ctgr.rencontre"));
-					vb_link.getChildren().add(ligne);
-					vb_link.getChildren().add(ctgr_rencontre);
-					for (Rencontre rencontre : result4) {
-						Hyperlink link_rencontre = new Hyperlink(rencontre.getNom_renc());
-						link_rencontre.setOnAction(new EventHandler<ActionEvent>() {
-
-							@Override
-							public void handle(ActionEvent event) {
-								MainApp.getInstance().showFicheEventEditDialog(rencontre, true, 0);
-							}
-						});
-						vb_link.getChildren().add(link_rencontre);
-					}
-
-				}
-				if (!result5.isEmpty()) {
-					Line ligne = new Line(0, 0, 588, 0);
-					Label ctgr_organisateur = new Label(Lang_bundle.getString("Ctgr.organisateur"));
-					vb_link.getChildren().add(ligne);
-					vb_link.getChildren().add(ctgr_organisateur);
-					for (Organisateur organisateur : result5) {
-						Hyperlink link_organisateur = new Hyperlink(organisateur.getNom_orga());
-						link_organisateur.setOnAction(new EventHandler<ActionEvent>() {
-
-							@Override
-							public void handle(ActionEvent event) {
-								MainApp.getInstance().showFicheEventEditDialog(organisateur.getRencontre(), true, 1);
-							}
-						});
-						vb_link.getChildren().add(link_organisateur);
-					}
-				}
-				tx.commit();
-				s.close();
-			} catch (Exception e) {
-			// ommition de la recherche a vide
-			}*/
+			/*
+			 * try { Session s = HibernateSetUp.getSession(); FullTextSession
+			 * fullTextSession = Search.getFullTextSession(s); Transaction tx =
+			 * fullTextSession.beginTransaction();
+			 * 
+			 * QueryBuilder qb =
+			 * fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+			 * Groupe.class).get(); org.apache.lucene.search.Query query =
+			 * qb.keyword().onFields("nom_groupe")
+			 * .matching(cst_tf_search.getText()).createQuery();
+			 * org.hibernate.Query hibQuery =
+			 * fullTextSession.createFullTextQuery(query, Groupe.class);
+			 * 
+			 * @SuppressWarnings("unchecked") List<Groupe> result1 =
+			 * hibQuery.list();
+			 * 
+			 * qb =
+			 * fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+			 * Personne.class).get(); query =
+			 * qb.keyword().onFields("nom_membre",
+			 * "prenom_membre").matching(cst_tf_search.getText())
+			 * .createQuery(); hibQuery =
+			 * fullTextSession.createFullTextQuery(query, Personne.class);
+			 * 
+			 * @SuppressWarnings("unchecked") List<Personne> result2 =
+			 * hibQuery.list();
+			 * 
+			 * qb =
+			 * fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+			 * Titre.class).get(); query = qb.keyword().onFields("titre",
+			 * "annee").matching(cst_tf_search.getText()).createQuery();
+			 * hibQuery = fullTextSession.createFullTextQuery(query,
+			 * Titre.class);
+			 * 
+			 * @SuppressWarnings("unchecked") List<Titre> result3 =
+			 * hibQuery.list();
+			 * 
+			 * qb =
+			 * fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+			 * Rencontre.class).get(); query = qb.keyword().onFields("nom_renc",
+			 * "ville_renc", "periodicite_renc")
+			 * .matching(cst_tf_search.getText()).createQuery(); hibQuery =
+			 * fullTextSession.createFullTextQuery(query, Rencontre.class);
+			 * 
+			 * @SuppressWarnings("unchecked") List<Rencontre> result4 =
+			 * hibQuery.list();
+			 * 
+			 * qb =
+			 * fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(
+			 * Organisateur.class).get(); query =
+			 * qb.keyword().onFields("nom_orga", "prenom_orga",
+			 * "entreprise_orga")
+			 * .matching(cst_tf_search.getText()).createQuery(); hibQuery =
+			 * fullTextSession.createFullTextQuery(query, Organisateur.class);
+			 * 
+			 * @SuppressWarnings("unchecked") List<Organisateur> result5 =
+			 * hibQuery.list();
+			 * 
+			 * if (!result1.isEmpty()) { Label ctgr_groupe = new
+			 * Label(Lang_bundle.getString("Ctgr.groupe"));
+			 * vb_link.getChildren().add(ctgr_groupe); for (Groupe groupe :
+			 * result1) { Hyperlink link_groupe = new
+			 * Hyperlink(groupe.getNom_groupe()); link_groupe.setOnAction(new
+			 * EventHandler<ActionEvent>() {
+			 * 
+			 * @Override public void handle(ActionEvent event) {
+			 * MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 0);
+			 * } }); vb_link.getChildren().add(link_groupe); } } if
+			 * (!result2.isEmpty()) { Line ligne = new Line(0, 0, 588, 0); Label
+			 * ctgr_personne = new
+			 * Label(Lang_bundle.getString("Ctgr.personne"));
+			 * vb_link.getChildren().add(ligne);
+			 * vb_link.getChildren().add(ctgr_personne); for (Personne personne
+			 * : result2) { Hyperlink link_personne = new
+			 * Hyperlink(personne.getNom_membre());
+			 * link_personne.setOnAction(new EventHandler<ActionEvent>() {
+			 * 
+			 * @Override public void handle(ActionEvent event) {
+			 * MainApp.getInstance().showFicheGroupeEditDialog(personne.
+			 * getGroupe(), true, 1); } });
+			 * vb_link.getChildren().add(link_personne); } } if
+			 * (!result3.isEmpty()) { Line ligne = new Line(0, 0, 588, 0); Label
+			 * ctgr_titre = new Label(Lang_bundle.getString("Ctgr.titre"));
+			 * vb_link.getChildren().add(ligne);
+			 * vb_link.getChildren().add(ctgr_titre); for (Titre titre :
+			 * result3) { Hyperlink link_titre = new
+			 * Hyperlink(titre.getTitre()); link_titre.setOnAction(new
+			 * EventHandler<ActionEvent>() {
+			 * 
+			 * @Override public void handle(ActionEvent event) {
+			 * MainApp.getInstance().showFicheGroupeEditDialog(titre.getGroupe()
+			 * , true, 2); } }); vb_link.getChildren().add(link_titre); } } if
+			 * (!result4.isEmpty()) { Line ligne = new Line(0, 0, 588, 0); Label
+			 * ctgr_rencontre = new
+			 * Label(Lang_bundle.getString("Ctgr.rencontre"));
+			 * vb_link.getChildren().add(ligne);
+			 * vb_link.getChildren().add(ctgr_rencontre); for (Rencontre
+			 * rencontre : result4) { Hyperlink link_rencontre = new
+			 * Hyperlink(rencontre.getNom_renc());
+			 * link_rencontre.setOnAction(new EventHandler<ActionEvent>() {
+			 * 
+			 * @Override public void handle(ActionEvent event) {
+			 * MainApp.getInstance().showFicheEventEditDialog(rencontre, true,
+			 * 0); } }); vb_link.getChildren().add(link_rencontre); }
+			 * 
+			 * } if (!result5.isEmpty()) { Line ligne = new Line(0, 0, 588, 0);
+			 * Label ctgr_organisateur = new
+			 * Label(Lang_bundle.getString("Ctgr.organisateur"));
+			 * vb_link.getChildren().add(ligne);
+			 * vb_link.getChildren().add(ctgr_organisateur); for (Organisateur
+			 * organisateur : result5) { Hyperlink link_organisateur = new
+			 * Hyperlink(organisateur.getNom_orga());
+			 * link_organisateur.setOnAction(new EventHandler<ActionEvent>() {
+			 * 
+			 * @Override public void handle(ActionEvent event) {
+			 * MainApp.getInstance().showFicheEventEditDialog(organisateur.
+			 * getRencontre(), true, 1); } });
+			 * vb_link.getChildren().add(link_organisateur); } } tx.commit();
+			 * s.close(); } catch (Exception e) { // ommition de la recherche a
+			 * vide }
+			 */
 		}
 	}
 
@@ -483,10 +468,13 @@ public final class MainViewController {
 	private Label lb_nb_event_passe;
 	@FXML
 	private ImageView img_view_main;
-	private ObservableList<Representation> repreDataTri = FXCollections.observableArrayList();
+	// private ObservableList<Representation> repreDataTri =
+	// FXCollections.observableArrayList();
 	private ObservableList<Rencontre> rencontreDataTri = FXCollections.observableArrayList();
-	public ObservableList<Personne> personneData = FXCollections.observableArrayList();
-	public ObservableList<Titre> titreData = FXCollections.observableArrayList();
+	// public ObservableList<Personne> personneData =
+	// FXCollections.observableArrayList();
+	// public ObservableList<Titre> titreData =
+	// FXCollections.observableArrayList();
 	public ObservableList<Rencontre> rencontreDataF = FXCollections.observableArrayList();
 	public ObservableList<Rencontre> rencontreDataP = FXCollections.observableArrayList();
 	private Date auj = new Date();
@@ -539,7 +527,9 @@ public final class MainViewController {
 		if (result.get() == ButtonType.OK) {
 			tv_reper.getItems().remove(tv_reper.getSelectionModel().getSelectedIndex());
 			try {
-				Crud.Serialize(tv_reper.getItems());
+				if (!tv_reper.getItems().isEmpty()) {
+					Crud.Serialize(tv_reper.getItems());
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -552,49 +542,41 @@ public final class MainViewController {
 	 * les labels de l'onglet repertoire de la fenetre principale.
 	 */
 	protected void showGroupeDetails(Groupe groupe) {
-		personneData.clear();
-		titreData.clear();
-		repreDataTri.clear();
 		rencontreDataTri.clear();
 		rencontreDataF.clear();
 		rencontreDataP.clear();
-		
+
 		if (groupe != null) {
-			
 			lb_nom_groupe.setText(groupe.getNom_groupe());
 			lb_carac_groupe.setText(groupe.getCarac_groupe());
 			lb_pays_groupe.setText(groupe.getPays_groupe());
 			lb_region_groupe.setText(groupe.getRegion_groupe());
-			
-				for (Personne personne : groupe.getListe_personne()) {
-					if (personne.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
-						personneData.add(personne);
+//			if (groupe.getListe_personne() != null && groupe.getListe_personne().size() > 0) {
+				lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
+//			}
+//			if (groupe.getListe_titre() != null && groupe.getListe_titre().size() > 0) {
+				lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
+//			}
+
+//			if (groupe.getListe_representation() != null && groupe.getListe_representation().size() > 0) {
+				for (Representation repreTri : groupe.getListe_representation()) {
+					for (Rencontre rencontre : MainApp.getInstance().rencontreData) {
+						for (Representation repre : rencontre.getListe_repre()) {
+							if (repreTri.getNom_Groupe().equals(repre.getNom_Groupe())) {
+								rencontreDataTri.add(rencontre);
+							}
+						}
 					}
 				}
-				for (Titre titre : groupe.getListe_titre()) {
-					if (titre.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
-						titreData.add(titre);
+				for (Rencontre rencTri : rencontreDataTri) {
+					if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
+						rencontreDataF.add(rencTri);
+					} else {
+						rencontreDataP.add(rencTri);
 					}
 				}
-				for (Representation repre : groupe.getListe_representation()) {
-					if (repre.getGroupe().getNom_groupe().equals(groupe.getNom_groupe())) {
-						repreDataTri.add(repre);
-					}
-				}
-			lb_nb_membre.setText(String.valueOf(personneData.size()));
-			lb_nb_titre.setText(String.valueOf(titreData.size()));
-			
-			for (Representation repreTri : repreDataTri) {
-				rencontreDataTri.add(repreTri.getRencontre());
-			}
-			for (Rencontre rencTri : rencontreDataTri) {
-				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
-					rencontreDataF.add(rencTri);
-				} else {
-					rencontreDataP.add(rencTri);
-				}
-			}
-			
+//			}
+
 			lb_nb_event_futur.setText(String.valueOf(rencontreDataF.size()));
 			lb_nb_event_passe.setText(String.valueOf(rencontreDataP.size()));
 			if (groupe.getImage() != null) {
@@ -644,8 +626,10 @@ public final class MainViewController {
 	@FXML
 	private Label lb_nb_repre;
 	private SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy");
-	public ObservableList<Organisateur> orgaData = FXCollections.observableArrayList();
-	public ObservableList<Representation> repreData = FXCollections.observableArrayList();
+	// public ObservableList<Organisateur> orgaData =
+	// FXCollections.observableArrayList();
+	// public ObservableList<Representation> repreData =
+	// FXCollections.observableArrayList();
 
 	/**
 	 * Appelé quand l'utilisateur clique sur le bouton Nouveau de l'onglet
@@ -692,7 +676,9 @@ public final class MainViewController {
 		if (result.get() == ButtonType.OK) {
 			tv_planif.getItems().remove(tv_planif.getSelectionModel().getSelectedIndex());
 			try {
-				Crud.Serialize(tv_planif.getItems());
+				if (!tv_planif.getItems().isEmpty()) {
+					Crud.Serialize(tv_planif.getItems());
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -705,26 +691,31 @@ public final class MainViewController {
 	 * labels de l'onglet planification de la fenetre principale.
 	 */
 	protected void showEventDetails(Rencontre rencontre) {
+		// orgaData.clear();
+		// repreData.clear();
+
 		if (rencontre != null) {
 			lb_lieu.setText(rencontre.getLieu_renc());
 			lb_date_deb.setText(simpleFormat.format(rencontre.getDate_deb_renc()));
 			lb_date_fin.setText(simpleFormat.format(rencontre.getDate_fin_renc()));
 			lb_nb_pers.setText(rencontre.getNb_pers_attendues().toString());
 			lb_perio.setText(rencontre.getPeriodicite_renc());
-			for (Rencontre renc : MainApp.getInstance().rencontreData) {
-				for (Organisateur orga : renc.getListe_orga()) {
-					if (orga.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
-						orgaData.add(orga);
-					}
-				}
-				for (Representation repre : renc.getListe_repre()) {
-					if (repre.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
-						repreData.add(repre);
-					}
-				}
-			}
-			lb_nb_orga.setText(String.valueOf(orgaData.size()));
-			lb_nb_repre.setText(String.valueOf(repreData.size()));
+			// for (Rencontre renc : MainApp.getInstance().rencontreData) {
+			// for (Organisateur orga : renc.getListe_orga()) {
+			// if (orga.getRencontre().getNom_renc().equals(renc.getNom_renc()))
+			// {
+			// orgaData.add(orga);
+			// }
+			// }
+			// for (Representation repre : renc.getListe_repre()) {
+			// if
+			// (repre.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
+			// repreData.add(repre);
+			// }
+			// }
+			// }
+			lb_nb_orga.setText(String.valueOf(rencontre.getListe_orga().size()));
+			lb_nb_repre.setText(String.valueOf(rencontre.getListe_repre().size()));
 		} else {
 			lb_lieu.setText("");
 			lb_date_deb.setText("");
@@ -768,6 +759,9 @@ public final class MainViewController {
 	 * Récupération du nombre d'utilisateurs et d'administrateurs
 	 */
 	private void countUser() {
+		compteurAdmin = 0;
+		compteurUser = 0;
+
 		for (User user : MainApp.getInstance().userData) {
 			if (user.getDroit_auth().equals("administrateur")) {
 				compteurAdmin++;
@@ -789,20 +783,22 @@ public final class MainViewController {
 	private void creerModifierUser() {
 		User user = new User();
 		user.setLogin(tf_admin_login.getText());
-		user.setMot_de_passe(CryptEtDecrypt.getSecurePassword(tf_admin_mdp.getText(), salt));
+		if (tf_admin_mdp.getText().length() != 0) {
+			user.setMot_de_passe(CryptEtDecrypt.getSecurePassword(tf_admin_mdp.getText(), salt));
+		}
 		if (!ts_adm_user.isSelected()) {
 			user.setDroit_auth("administrateur");
 		} else {
 			user.setDroit_auth("utilisateur");
 		}
 		try {
-			user.validateObject();	
+			user.validateObject();
 			tv_admin.getItems().add(user);
 			Crud.Serialize(tv_admin.getItems());
 			annulerUser();
 		} catch (InvalidObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -834,8 +830,8 @@ public final class MainViewController {
 					Lang_bundle.getString("Confirmation.de.suppression"), Lang_bundle.getString("Login.deja.utilise"))
 					.showAndWait();
 			if (result.get() == ButtonType.OK) {
-//				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
-//				annulerUser();
+				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
+				annulerUser();
 				deconnection();
 			}
 		} else {
@@ -843,15 +839,14 @@ public final class MainViewController {
 					Lang_bundle.getString("Confirmation.de.suppression"),
 					Lang_bundle.getString("Voulez-vous.supprimer.utilisateur.?")).showAndWait();
 			if (result.get() == ButtonType.OK) {
-//				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
-//				annulerUser();
+				tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
+				annulerUser();
 			}
 		}
-		
-		tv_admin.getItems().remove(tv_admin.getSelectionModel().getSelectedItem());
-		annulerUser();
 		try {
-			Crud.Serialize(tv_admin.getItems());
+			if (!tv_admin.getItems().isEmpty()) {
+				Crud.Serialize(tv_admin.getItems());
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

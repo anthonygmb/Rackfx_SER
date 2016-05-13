@@ -15,7 +15,6 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 	private String fax_orga;
 	private String mail_orga;
 	private String entreprise_orga;
-	private Rencontre rencontre;
 
 	public Organisateur() {
 		this(null, null, false, null, null, null, null, null);
@@ -32,16 +31,6 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 		this.mail_orga = mail_orga;
 		this.entreprise_orga = entreprise_orga;
 	}
-
-	// =================================================================================================
-	// public long getOrgaId() {
-	// return orgaId;
-	// }
-	//
-	// @SuppressWarnings("unused")
-	// private void setOrgaId(long orgaId) {
-	// this.orgaId = orgaId;
-	// }
 
 	// =================================================================================================
 	public String getNom_orga() {
@@ -116,22 +105,13 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Rencontre getRencontre() {
-		return rencontre;
-	}
-
-	public void setRencontre(Rencontre rencontre) {
-		this.rencontre = rencontre;
-	}
-
-	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.nom_orga == null) {
+		if (this.nom_orga == null || this.nom_orga.length() == 0) {
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
-		} else if (this.prenom_orga == null) {
+		} else if (this.prenom_orga == null || this.prenom_orga.length() == 0) {
 			throw new InvalidObjectException("Le champ prenom ne doit pas être vide");
-		} else if (this.tel_orga == null) {
+		} else if (this.tel_orga == null || this.tel_orga.length() == 0) {
 			throw new InvalidObjectException("Le champ telephone ne doit pas être vide");
 		}
 	}

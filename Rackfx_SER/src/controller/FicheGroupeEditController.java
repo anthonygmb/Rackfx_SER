@@ -12,8 +12,6 @@ import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -267,14 +265,6 @@ public class FicheGroupeEditController {
 		this.dialogStage = dialogStage;
 	}
 
-	/**
-	 * Méthode de mise à jour des entités enfants
-	 */
-	private void loadChildren() {
-		cmbox_membre.setItems(MainViewController.getInstance().personneData);
-		tbv_titre.setItems(MainViewController.getInstance().titreData);
-	}
-
 	/*
 	 * =========================================================================
 	 * ONGLET INFORMATIONS
@@ -326,8 +316,10 @@ public class FicheGroupeEditController {
 			img_view.setImage(imageOrigine);
 		}
 		btn_creer_groupe.setText((modif) ? Lang_bundle.getString("Appliquer") : Lang_bundle.getString("Creer"));
-		loadChildren();
-		loadRencontres();
+		cmbox_membre.setItems(groupe.getListe_personne());
+		tbv_titre.setItems(groupe.getListe_titre());
+		tbv_event_f.setItems(MainViewController.getInstance().rencontreDataF);
+		tbv_event_p.setItems(MainViewController.getInstance().rencontreDataP);
 	}
 
 	/**
@@ -353,20 +345,23 @@ public class FicheGroupeEditController {
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouveau.groupe"))) {
 				geleTab(true);
 				MainApp.getInstance().groupeData.add(groupe);
+				MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
 				MainViewController.getInstance().tv_reper.getSelectionModel().selectLast();
 			} else {
 				MainViewController.getInstance().showGroupeDetails(groupe);
 				int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
 				MainApp.getInstance().groupeData.set(index, groupe);
+				MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
 				MainViewController.getInstance().tv_reper.getSelectionModel().select(index);
 			}
 			Crud.Serialize(MainApp.getInstance().groupeData);
 			dialogStage.setTitle(groupe.getNom_groupe());
 			btn_creer_groupe.setText(Lang_bundle.getString("Appliquer"));
-			loadChildren();
+			cmbox_membre.setItems(groupe.getListe_personne());
+			tbv_titre.setItems(groupe.getListe_titre());
 		} catch (InvalidObjectException e) { /* si la validation a échoué */
-			// TODO
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -442,9 +437,8 @@ public class FicheGroupeEditController {
 	private CheckBox ckbox_corres_membre;
 	@FXML
 	private DatePicker dtp_date_naiss_membre;
-	private ObservableList<Personne> personneData = FXCollections.observableArrayList();
 	@FXML
-	private ComboBox<Personne> cmbox_membre = new ComboBox<>(personneData);
+	private ComboBox<Personne> cmbox_membre = new ComboBox<>(/* personneData */);// TODO
 	@FXML
 	private Button btn_creer_membre;
 	@FXML
@@ -629,17 +623,19 @@ public class FicheGroupeEditController {
 		try {
 			personne.validateObject();
 			if (cmbox_membre.getSelectionModel().getSelectedItem() == null) {
-				personne.setGroupe(groupe);
 				groupe.getListe_personne().add(personne);
-				cmbox_membre.getItems().add(personne);
 			} else {
-				cmbox_membre.getItems().set(cmbox_membre.getSelectionModel().getSelectedIndex(), personne);
+				groupe.getListe_personne().set(cmbox_membre.getSelectionModel().getSelectedIndex(), personne);
 			}
-			Crud.Serialize(cmbox_membre.getItems());
+			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().groupeData.set(index, groupe);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			cmbox_membre.setItems(groupe.getListe_personne());
+			Crud.Serialize(MainApp.getInstance().groupeData);
 			annulerPersonne();
 		} catch (InvalidObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -678,9 +674,13 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.membre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			cmbox_membre.getItems().remove(cmbox_membre.getSelectionModel().getSelectedItem());
+			groupe.getListe_personne().remove(cmbox_membre.getSelectionModel().getSelectedItem());
+			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().groupeData.set(index, groupe);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			cmbox_membre.setItems(groupe.getListe_personne());
 			try {
-				Crud.Serialize(cmbox_membre.getItems());
+				Crud.Serialize(MainApp.getInstance().groupeData);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -700,9 +700,8 @@ public class FicheGroupeEditController {
 	private Button btn_creer_titre;
 	@FXML
 	private Button btn_supp_titre;
-	private ObservableList<Titre> titreData = FXCollections.observableArrayList();
 	@FXML
-	private TableView<Titre> tbv_titre = new TableView<>(titreData);
+	private TableView<Titre> tbv_titre = new TableView<>(/*titreData*/);//TODO
 	@FXML
 	private TableColumn<Titre, String> col_titre_titre;
 	@FXML
@@ -803,17 +802,19 @@ public class FicheGroupeEditController {
 		try {
 			titre.validateObject();
 			if (tbv_titre.getSelectionModel().getSelectedItem() == null) {
-				titre.setGroupe(groupe);
 				groupe.getListe_titre().add(titre);
-				tbv_titre.getItems().add(titre);
 			} else {
-				tbv_titre.getItems().set(tbv_titre.getSelectionModel().getSelectedIndex(), titre);
+				groupe.getListe_titre().set(tbv_titre.getSelectionModel().getSelectedIndex(), titre);
 			}
-			Crud.Serialize(tbv_titre.getItems());
+			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().groupeData.set(index, groupe);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			tbv_titre.setItems(groupe.getListe_titre());
+			Crud.Serialize(MainApp.getInstance().groupeData);
 			annulerTitre();
 		} catch (InvalidObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -848,9 +849,13 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.titre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			tbv_titre.getItems().remove(tbv_titre.getSelectionModel().getSelectedItem());
+			groupe.getListe_titre().remove(tbv_titre.getSelectionModel().getSelectedItem());
+			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().groupeData.set(index, groupe);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			tbv_titre.setItems(groupe.getListe_titre());
 			try {
-				Crud.Serialize(tbv_titre.getItems());
+				Crud.Serialize(MainApp.getInstance().groupeData);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -877,14 +882,14 @@ public class FicheGroupeEditController {
 	@FXML
 	private TableColumn<Rencontre, java.sql.Date> col_fin_event_f;
 
-	/**
-	 * récupération de la liste de rencontres pour les placer dans les tableaux
-	 * d'événements futurs et passés
-	 */
-	private void loadRencontres() {
-		tbv_event_f.setItems(MainViewController.getInstance().rencontreDataF);
-		tbv_event_p.setItems(MainViewController.getInstance().rencontreDataP);
-	}
+//	/**
+//	 * récupération de la liste de rencontres pour les placer dans les tableaux
+//	 * d'événements futurs et passés
+//	 */
+//	private void loadRencontres() {
+//		tbv_event_f.setItems(MainViewController.getInstance().rencontreDataF);
+//		tbv_event_p.setItems(MainViewController.getInstance().rencontreDataP);
+//	}
 
 	/*
 	 * =========================================================================

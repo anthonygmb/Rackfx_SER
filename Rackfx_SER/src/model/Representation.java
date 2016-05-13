@@ -21,8 +21,6 @@ public class Representation implements Serializable, ObjectInputValidation {
 	private transient ObjectProperty<Time> heure_finProp;
 	private transient StringProperty nom_groupeProp;
 	private transient StringProperty nom_titreProp;
-	private Rencontre rencontre;
-	private Groupe groupe;
 
 	public Representation() {
 		this(null, null, null, null);
@@ -92,33 +90,15 @@ public class Representation implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Rencontre getRencontre() {
-		return rencontre;
-	}
-
-	public void setRencontre(Rencontre rencontre) {
-		this.rencontre = rencontre;
-	}
-
-	// =================================================================================================
-	public Groupe getGroupe() {
-		return groupe;
-	}
-
-	public void setGroupe(Groupe groupe) {
-		this.groupe = groupe;
-	}
-
-	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
 		if (this.heure_debut == null) {
 			throw new InvalidObjectException("Le champ heure de début ne doit pas être vide");
 		} else if (this.heure_fin == null) {
 			throw new InvalidObjectException("Le champ heure de fin ne doit pas être vide");
-		} else if (this.nom_groupe == null) {
+		} else if (this.nom_groupe == null || this.nom_groupe.length() == 0) {
 			throw new InvalidObjectException("Le champ groupe ne doit pas être vide");
-		} else if (this.nom_titre == null) {
+		} else if (this.nom_titre == null || this.nom_titre.length() == 0) {
 			throw new InvalidObjectException("Le champ titre ne doit pas être vide");
 		}
 	}

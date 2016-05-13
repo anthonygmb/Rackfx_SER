@@ -4,13 +4,14 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputValidation;
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Hashtable;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Rencontre implements Serializable, ObjectInputValidation {
 
@@ -26,8 +27,10 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 	private transient ObjectProperty<Date> date_fin_rencProp;
 	private String periodicite_renc;
 	private Long nb_pers_attendues;
-	private Set<Organisateur> liste_orga = new HashSet<Organisateur>();
-	private Set<Representation> liste_repre = new HashSet<Representation>();
+	private Hashtable<Integer, Organisateur> liste_orgaSER = new Hashtable<Integer, Organisateur>();
+	private Hashtable<Integer, Representation> liste_representationSER = new Hashtable<Integer, Representation>();
+	private transient ObservableList<Organisateur> liste_orga = FXCollections.observableArrayList();
+	private transient ObservableList<Representation> liste_repre = FXCollections.observableArrayList();
 
 	public Rencontre() {
 		this(null, null, null, null, null, null, 0);
@@ -128,29 +131,43 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Set<Organisateur> getListe_orga() {
+	public ObservableList<Organisateur> getListe_orga() {
+		liste_orga.clear();
+		for (int i = 0; i < this.liste_orgaSER.size(); i++) {
+			liste_orga.add(this.liste_orgaSER.get(i));
+		}
 		return liste_orga;
 	}
 
-	public void setListe_orga(Set<Organisateur> liste_orga) {
+	public void setListe_orga(ObservableList<Organisateur> liste_orga) {
 		this.liste_orga = liste_orga;
+		for (int i = 0; i < this.liste_repre.size(); i++) {
+			liste_orgaSER.put(i, this.liste_orga.get(i));
+		}
 	}
 
 	// =================================================================================================
-	public Set<Representation> getListe_repre() {
+	public ObservableList<Representation> getListe_repre() {
+		liste_repre.clear();
+		for (int i = 0; i < this.liste_representationSER.size(); i++) {
+			liste_repre.add(this.liste_representationSER.get(i));
+		}
 		return liste_repre;
 	}
 
-	public void setListe_repre(Set<Representation> liste_repre) {
+	public void setListe_repre(ObservableList<Representation> liste_repre) {
 		this.liste_repre = liste_repre;
+		for (int i = 0; i < this.liste_repre.size(); i++) {
+			liste_representationSER.put(i, this.liste_repre.get(i));
+		}
 	}
 
 	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.nom_renc == null) {
+		if (this.nom_renc == null || this.nom_renc.length() == 0) {
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
-		} else if (this.ville_renc == null) {
+		} else if (this.ville_renc == null || this.ville_renc.length() == 0) {
 			throw new InvalidObjectException("Le champ ville ne doit pas être vide");
 		}
 	}

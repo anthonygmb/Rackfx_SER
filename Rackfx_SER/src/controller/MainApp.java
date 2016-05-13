@@ -50,11 +50,23 @@ public final class MainApp extends Application {
 	public MainApp() {
 		try {
 			groupeData.addAll(Crud.Deserialize(Groupe.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde groupes trouvé\n");
+		}
+		try {
 			rencontreData.addAll(Crud.Deserialize(Rencontre.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde rencontres trouvé\n");
+		}
+		try {
 			userData.addAll(Crud.Deserialize(User.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde utilisateurs trouvé\n");
+		}
+		try {
 			parametresData.addAll(Crud.Deserialize(Parametres.class));
 		} catch (ClassNotFoundException | IOException e) {
-			System.out.printf("Première sérialisation");
+			System.out.printf("Aucun fichier de sauvegarde paramètres trouvé\n");
 		}
 
 		if (parametresData.isEmpty()) {

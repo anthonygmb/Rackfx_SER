@@ -8,8 +8,6 @@ import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -220,9 +218,8 @@ public class FicheEventEditController {
 					cmbox_titre_event.getSelectionModel().clearSelection();
 				} else {
 					cmbox_titre_event.getItems().clear();
-					// titreData2.addAll(Crud.getAllWhere("Titre", "groupeId",
-					// newValue.getGroupeId()));
-					cmbox_titre_event.setItems(MainViewController.getInstance().titreData);
+					cmbox_titre_event
+							.setItems(cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_titre());
 				}
 			}
 		});
@@ -274,15 +271,15 @@ public class FicheEventEditController {
 		this.dialogStage = dialogStage;
 	}
 
-	/**
-	 * Méthode de mise à jour des entités enfants
-	 */
-	private void loadChildren() {
-		orgaData.setAll(MainViewController.getInstance().orgaData);
-		repreData.setAll(MainViewController.getInstance().repreData);
-		cmbox_orga.setItems(orgaData);
-		tbv_prog.setItems(repreData);
-	}
+	// /**
+	// * Méthode de mise à jour des entités enfants
+	// */
+	// private void loadChildren() {
+	// orgaData.setAll(MainViewController.getInstance().orgaData);
+	// repreData.setAll(MainViewController.getInstance().repreData);
+	// cmbox_orga.setItems(orgaData);
+	// tbv_prog.setItems(repreData);
+	// }
 
 	/*
 	 * =========================================================================
@@ -341,7 +338,9 @@ public class FicheEventEditController {
 		}
 		cmbox_perio_event.getItems().addAll(Res_listes.perio_event);
 		btn_creer_event.setText((modif) ? Lang_bundle.getString("Appliquer") : Lang_bundle.getString("Creer"));
-		loadChildren();
+		// loadChildren();
+		cmbox_orga.setItems(rencontre.getListe_orga());
+		tbv_prog.setItems(rencontre.getListe_repre());
 	}
 
 	/**
@@ -368,26 +367,29 @@ public class FicheEventEditController {
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouvelle.rencontre"))) {
 				geleTab(true);
 				MainApp.getInstance().rencontreData.add(rencontre);
+				MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
 				MainViewController.getInstance().tv_planif.getSelectionModel().selectLast();
 			} else {
 				MainViewController.getInstance().showEventDetails(rencontre);
 				int index = MainViewController.getInstance().tv_planif.getSelectionModel().getFocusedIndex();
 				MainApp.getInstance().rencontreData.set(index, rencontre);
+				MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
 				MainViewController.getInstance().tv_planif.getSelectionModel().select(index);
 			}
 			Crud.Serialize(MainApp.getInstance().rencontreData);
 			dialogStage.setTitle(rencontre.getNom_renc());
 			btn_creer_event.setText(Lang_bundle.getString("Appliquer"));
-			loadChildren();
+			cmbox_orga.setItems(rencontre.getListe_orga());
+			tbv_prog.setItems(rencontre.getListe_repre());
 		} catch (InvalidObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ValidateurExeption e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		}
 	}
 
@@ -424,9 +426,10 @@ public class FicheEventEditController {
 	private TextField tf_mail_orga;
 	@FXML
 	private TextField tf_entreprise_orga;
-	private ObservableList<Organisateur> orgaData = FXCollections.observableArrayList();
+	// private ObservableList<Organisateur> orgaData =
+	// FXCollections.observableArrayList();
 	@FXML
-	private ComboBox<Organisateur> cmbox_orga = new ComboBox<>(orgaData);
+	private ComboBox<Organisateur> cmbox_orga = new ComboBox<>(/* orgaData */);// TODO
 	@FXML
 	private Button btn_creer_orga;
 	@FXML
@@ -528,17 +531,19 @@ public class FicheEventEditController {
 		try {
 			organisateur.validateObject();
 			if (cmbox_orga.getSelectionModel().getSelectedItem() == null) {
-				organisateur.setRencontre(rencontre);
 				rencontre.getListe_orga().add(organisateur);
-				cmbox_orga.getItems().add(organisateur);
 			} else {
-				cmbox_orga.getItems().set(cmbox_orga.getSelectionModel().getSelectedIndex(), organisateur);
+				rencontre.getListe_orga().set(cmbox_orga.getSelectionModel().getSelectedIndex(), organisateur);
 			}
-			Crud.Serialize(cmbox_orga.getItems());
+			int index = MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().rencontreData.set(index, rencontre);
+			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
+			cmbox_orga.setItems(rencontre.getListe_orga());
+			Crud.Serialize(MainApp.getInstance().rencontreData);
 			annulerOrganisateur();
 		} catch (InvalidObjectException e) { /* si la validation a échoué */
-			// TODO
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -575,9 +580,12 @@ public class FicheEventEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.cet.organisateur.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			cmbox_orga.getItems().remove(cmbox_orga.getSelectionModel().getSelectedItem());
+			rencontre.getListe_orga().remove(cmbox_orga.getSelectionModel().getSelectedItem());
+			int index = MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex();
+			MainApp.getInstance().rencontreData.set(index, rencontre);
+			cmbox_orga.setItems(rencontre.getListe_orga());
 			try {
-				Crud.Serialize(cmbox_orga.getItems());
+				Crud.Serialize(MainApp.getInstance().groupeData);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -596,9 +604,10 @@ public class FicheEventEditController {
 	private Button btn_creer_prog;
 	@FXML
 	private Button btn_supp_prog;
-	private ObservableList<Representation> repreData = FXCollections.observableArrayList();
+	// private ObservableList<Representation> repreData =
+	// FXCollections.observableArrayList();
 	@FXML
-	private TableView<Representation> tbv_prog = new TableView<>(repreData);
+	private TableView<Representation> tbv_prog = new TableView<>(/* repreData */);// TODO
 	@FXML
 	private TableColumn<Representation, String> col_groupe_prog;
 	@FXML
@@ -609,10 +618,12 @@ public class FicheEventEditController {
 	private TableColumn<Representation, Time> col_fin_prog;
 	@FXML
 	private ComboBox<Groupe> cmbox_groupe_event = new ComboBox<>(MainApp.getInstance().groupeData);
-	// private ObservableList<Titre> titreData2 =
-	// FXCollections.observableArrayList();
 	@FXML
-	private ComboBox<Titre> cmbox_titre_event = new ComboBox<>(MainViewController.getInstance().titreData);
+	private ComboBox<Titre> cmbox_titre_event = new ComboBox<>(/*
+																 * MainViewController
+																 * .getInstance(
+																 * ).titreData
+																 */);// TODO
 	@FXML
 	private LocalTimePicker ltp_h_deb_prog;
 	@FXML
@@ -632,12 +643,18 @@ public class FicheEventEditController {
 				if (representation.getNom_Groupe().equals(groupeIt.getNom_groupe())) {
 					cmbox_groupe_event.getSelectionModel().select(groupeIt);
 				}
-			}
-			for (Titre titreiT : MainViewController.getInstance().titreData) {
-				if (representation.getNom_Titre().equals(titreiT.getTitre())) {
-					cmbox_titre_event.getSelectionModel().select(titreiT);
+				for (Titre titreiT : groupeIt.getListe_titre()) {
+					if (representation.getNom_Titre().equals(titreiT.getTitre())) {
+						cmbox_titre_event.getSelectionModel().select(titreiT);
+					}
 				}
 			}
+			// for (Titre titreiT : MainViewController.getInstance().titreData)
+			// {
+			// if (representation.getNom_Titre().equals(titreiT.getTitre())) {
+			// cmbox_titre_event.getSelectionModel().select(titreiT);
+			// }
+			// }
 			ltp_h_deb_prog.setLocalTime(representation.getHeure_debut().toLocalTime());
 			ltp_h_fin_prog.setLocalTime(representation.getHeure_fin().toLocalTime());
 			btn_creer_prog.setText(Lang_bundle.getString("Appliquer"));
@@ -665,25 +682,35 @@ public class FicheEventEditController {
 			representation.validateObject();
 			Validateur.valideTime(ltp_h_deb_prog.getLocalTime(), ltp_h_fin_prog.getLocalTime());
 			if (tbv_prog.getSelectionModel().getSelectedItem() == null) {
-				representation.setRencontre(rencontre);
-				rencontre.getListe_repre().add(representation);
-				representation.setGroupe(cmbox_groupe_event.getSelectionModel().getSelectedItem());
-				cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_representation().add(representation);
 				tbv_prog.getItems().add(representation);
 			} else {
 				tbv_prog.getItems().set(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
 			}
-			Crud.Serialize(tbv_prog.getItems());
+			rencontre.getListe_repre().add(representation);
+			cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_representation().add(representation);
+
+			MainApp.getInstance().groupeData.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(),
+					cmbox_groupe_event.getSelectionModel().getSelectedItem());
+			MainApp.getInstance().rencontreData
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), rencontre);
+
+			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+
+			Crud.Serialize(MainApp.getInstance().groupeData);
+			Crud.Serialize(MainApp.getInstance().rencontreData);
+			cmbox_groupe_event.setItems(MainApp.getInstance().groupeData);
+
 			annulerProg();
 		} catch (InvalidObjectException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ValidateurExeption e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
+					e.getMessage()).showAndWait();
 		}
 	}
 
@@ -712,9 +739,23 @@ public class FicheEventEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.cette.representation.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			tbv_prog.getItems().remove(tbv_prog.getSelectionModel().getSelectedItem());
+			rencontre.getListe_repre().remove(tbv_prog.getSelectionModel().getSelectedItem());
+			cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_representation()
+					.remove(tbv_prog.getSelectionModel().getSelectedItem());
+
+			MainApp.getInstance().groupeData.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(),
+					cmbox_groupe_event.getSelectionModel().getSelectedItem());
+			MainApp.getInstance().rencontreData
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), rencontre);
+
+			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
+			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+
+			cmbox_groupe_event.setItems(MainApp.getInstance().groupeData);
+			
 			try {
-				Crud.Serialize(tbv_prog.getItems());
+				Crud.Serialize(MainApp.getInstance().groupeData);
+				Crud.Serialize(MainApp.getInstance().rencontreData);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -40,9 +40,9 @@ public class Parametres implements Serializable, ObjectInputValidation {
 	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.langue == null) {
+		if (this.langue == null || this.langue.length() == 0) {
 			throw new InvalidObjectException("Le champ langue ne doit pas être vide");
-		} else if (this.theme == null) {
+		} else if (this.theme == null || this.theme.length() == 0) {
 			throw new InvalidObjectException("Le champ theme ne doit pas être vide");
 		}
 	}

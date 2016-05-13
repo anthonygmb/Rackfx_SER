@@ -20,7 +20,6 @@ public class Personne implements Serializable, ObjectInputValidation {
 	private String tel_cor;
 	private String fax_cor;
 	private String mail_cor;
-	private Groupe groupe;
 
 	public Personne() {
 		this(null, null, false, null, null, null, null, false, null, null, null, null);
@@ -152,20 +151,11 @@ public class Personne implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Groupe getGroupe() {
-		return groupe;
-	}
-
-	public void setGroupe(Groupe groupe) {
-		this.groupe = groupe;
-	}
-
-	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.nom_membre == null) {
+		if (this.nom_membre == null || this.nom_membre.length() == 0) {
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
-		} else if (this.prenom_membre == null) {
+		} else if (this.prenom_membre == null || this.prenom_membre.length() == 0) {
 			throw new InvalidObjectException("Le champ prenom ne doit pas être vide");
 		}
 	}

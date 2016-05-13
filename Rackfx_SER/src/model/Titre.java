@@ -13,22 +13,24 @@ import javafx.beans.property.StringProperty;
 public class Titre implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = 4638810562674152997L;
-	private StringProperty titre;
-	private StringProperty annee;
-	private ObjectProperty<Time> duree;
+	private String titre;
+	private String annee;
+	private transient StringProperty titreProp;
+	private transient StringProperty anneeProp;
+	private Time duree;
+	private transient ObjectProperty<Time> dureeProp;
 	private String genre;
 	private boolean reprise_titre;
 	private String auteur;
-	private Groupe groupe;
 
 	public Titre() {
 		this(null, null, null, null, false, null);
 	}
 
 	public Titre(String titre, String annee, Time duree, String genre, boolean reprise_titre, String auteur) {
-		this.titre = new SimpleStringProperty(titre);
-		this.annee = new SimpleStringProperty(annee);
-		this.duree = new SimpleObjectProperty<Time>(duree);
+		this.titre = titre;
+		this.annee = annee;
+		this.duree = duree;
 		this.genre = genre;
 		this.reprise_titre = reprise_titre;
 		this.auteur = auteur;
@@ -36,41 +38,44 @@ public class Titre implements Serializable, ObjectInputValidation {
 
 	// =================================================================================================
 	public String getTitre() {
-		return titre.get();
+		return titre;
 	}
 
 	public void setTitre(String titre) {
-		this.titre.set(titre);
+		this.titre = titre;
+		this.titreProp = new SimpleStringProperty(titre);
 	}
 
 	public StringProperty titreProperty() {
-		return titre;
+		return titreProp;
 	}
 
 	// =================================================================================================
 	public String getAnnee() {
-		return annee.get();
+		return annee;
 	}
 
 	public void setAnnee(String annee) {
-		this.annee.set(annee);
+		this.annee = annee;
+		this.anneeProp = new SimpleStringProperty(annee);
 	}
 
 	public StringProperty anneeProperty() {
-		return annee;
+		return anneeProp;
 	}
 
 	// =================================================================================================
 	public Time getDuree() {
-		return duree.get();
+		return duree;
 	}
 
 	public void setDuree(Time duree) {
-		this.duree.set(duree);
+		this.duree = duree;
+		this.dureeProp = new SimpleObjectProperty<Time>(duree);
 	}
 
 	public ObjectProperty<Time> dureeProperty() {
-		return duree;
+		return dureeProp;
 	}
 
 	// =================================================================================================
@@ -101,18 +106,9 @@ public class Titre implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Groupe getGroupe() {
-		return groupe;
-	}
-
-	public void setGroupe(Groupe groupe) {
-		this.groupe = groupe;
-	}
-
-	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.titre == null) {
+		if (this.titre == null || this.titre.length() == 0) {
 			throw new InvalidObjectException("Le champ titre ne doit pas être vide");
 		} else if (this.duree == null) {
 			throw new InvalidObjectException("Le champ durée ne doit pas être vide");

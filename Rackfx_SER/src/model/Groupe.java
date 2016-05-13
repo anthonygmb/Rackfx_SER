@@ -3,11 +3,12 @@ package model;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputValidation;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Hashtable;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Groupe implements Serializable, ObjectInputValidation {
 
@@ -17,9 +18,12 @@ public class Groupe implements Serializable, ObjectInputValidation {
 	private String carac_groupe;
 	private String pays_groupe;
 	private String region_groupe;
-	private Set<Personne> liste_personne = new HashSet<Personne>();
-	private Set<Titre> liste_titre = new HashSet<Titre>();
-	private Set<Representation> liste_representation = new HashSet<Representation>();
+	private Hashtable<Integer, Personne> liste_personneSER = new Hashtable<Integer, Personne>();
+	private Hashtable<Integer, Titre> liste_titreSER = new Hashtable<Integer, Titre>();
+	private Hashtable<Integer, Representation> liste_representationSER = new Hashtable<Integer, Representation>();
+	private transient ObservableList<Personne> liste_personne = FXCollections.observableArrayList();
+	private transient ObservableList<Titre> liste_titre = FXCollections.observableArrayList();
+	private transient ObservableList<Representation> liste_representation = FXCollections.observableArrayList();
 	private byte[] image;
 
 	public Groupe() {
@@ -75,30 +79,51 @@ public class Groupe implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public Set<Personne> getListe_personne() {
+	public ObservableList<Personne> getListe_personne() {
+		liste_personne.clear();
+		for (int i = 0; i < this.liste_personneSER.size(); i++) {
+			liste_personne.add(this.liste_personneSER.get(i));
+		}
 		return liste_personne;
 	}
 
-	public void setListe_personne(Set<Personne> liste_personne) {
+	public void setListe_personne(ObservableList<Personne> liste_personne) {
 		this.liste_personne = liste_personne;
+		for (int i = 0; i < this.liste_personne.size(); i++) {
+			liste_personneSER.put(i, this.liste_personne.get(i));
+		}
 	}
 
 	// =================================================================================================
-	public Set<Titre> getListe_titre() {
+	public ObservableList<Titre> getListe_titre() {
+		liste_titre.clear();
+		for (int i = 0; i < this.liste_titreSER.size(); i++) {
+			liste_titre.add(this.liste_titreSER.get(i));
+		}
 		return liste_titre;
 	}
 
-	public void setListe_titre(Set<Titre> liste_titre) {
+	public void setListe_titre(ObservableList<Titre> liste_titre) {
 		this.liste_titre = liste_titre;
+		for (int i = 0; i < this.liste_titre.size(); i++) {
+			liste_titreSER.put(i, this.liste_titre.get(i));
+		}
 	}
 
 	// =================================================================================================
-	public Set<Representation> getListe_representation() {
+	public ObservableList<Representation> getListe_representation() {
+		liste_representation.clear();
+		for (int i = 0; i < this.liste_representationSER.size(); i++) {
+			liste_representation.add(this.liste_representationSER.get(i));
+		}
 		return liste_representation;
 	}
 
-	public void setListe_representation(Set<Representation> liste_representation) {
+	public void setListe_representation(ObservableList<Representation> liste_representation) {
 		this.liste_representation = liste_representation;
+		for (int i = 0; i < this.liste_representation.size(); i++) {
+			liste_representationSER.put(i, this.liste_representation.get(i));
+		}
 	}
 
 	// =================================================================================================
@@ -113,7 +138,7 @@ public class Groupe implements Serializable, ObjectInputValidation {
 	// =================================================================================================
 	@Override
 	public void validateObject() throws InvalidObjectException {
-		if (this.nom_groupe == null) {
+		if (this.nom_groupe == null || this.nom_groupe.length() == 0) {
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
 		}
 	}
