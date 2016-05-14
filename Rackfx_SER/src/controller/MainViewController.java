@@ -113,7 +113,10 @@ public final class MainViewController {
 			System.out.printf("Aucun fichier de sauvegarde utilisateurs trouvé\n");
 		}
 
-		/* récupération des listes de groupes, de rencontres et de users */
+		/*
+		 * reecriture des champs ayants des SimpleProperties pour l'affichage
+		 * dans les tableaux
+		 */
 		for (Groupe groupe : tv_reper.getItems()) {
 			groupe.setNom_groupe(groupe.getNom_groupe());
 			for (int j = 0; j < groupe.getListe_titre().size(); j++) {
@@ -576,15 +579,23 @@ public final class MainViewController {
 			lb_region_groupe.setText(groupe.getRegion_groupe());
 			lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
 			lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
-			for (Representation repreTri : groupe.getListe_representation()) {
+			
+			System.out.printf("showGroupeDetails : %d\n", groupe.getListe_representation().size());//TODO
+			
+//			for (Representation repreTri : groupe.getListe_representation()) {
 				for (Rencontre rencontre : tv_planif.getItems()) {
 					for (Representation repre : rencontre.getListe_representation()) {
+						for (Representation repreTri : groupe.getListe_representation()) {
 						if (repreTri.getNom_Groupe().equals(repre.getNom_Groupe())) {
 							rencontreDataTri.add(rencontre);
 						}
+						}
 					}
 				}
-			}
+//			}
+			
+			System.out.printf("rencontreDataTri : %d\n", rencontreDataTri.size());//TODO
+
 			for (Rencontre rencTri : rencontreDataTri) {
 				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
 					rencontreDataF.add(rencTri);

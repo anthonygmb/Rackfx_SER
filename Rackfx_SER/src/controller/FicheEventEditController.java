@@ -654,31 +654,34 @@ public class FicheEventEditController {
 			Validateur.valideTime(ltp_h_deb_prog.getLocalTime(), ltp_h_fin_prog.getLocalTime());
 
 			if (tbv_prog.getSelectionModel().getSelectedItem() == null) {
-
 				rencontre.addRepresentationToList(representation);
 				tempGroupe.addRepresentationToList(representation);
 				tbv_prog.getItems().add(representation);
-
 			} else {
-				// rencontre.setRepresentationToList(tbv_prog.getSelectionModel().getSelectedIndex(),
-				// representation);
-				// MainViewController.getInstance().tv_reper.getItems()
-				// .get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
-				// .setRepresentationToList(representation);//TODO
+				int index2 = 0;
+				for (int i = 0; i < rencontre.getListe_representation().size(); i++) {
+					if (rencontre.getListe_representation().get(i).getNom_Groupe()
+							.equals(representation.getNom_Groupe())) {
+						index2 = i;
+					}
+				}
+
+				rencontre.setRepresentationToList(index2, representation);
+
+				MainViewController.getInstance().tv_reper.getItems()
+						.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
+						.setRepresentationToList(index2, representation);// TODO
 
 				tbv_prog.getItems().set(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
 			}
-
 			MainViewController.getInstance().tv_planif.getItems()
 					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
-
 			MainViewController.getInstance().tv_reper.getItems()
-					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
+					.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(), tempGroupe);
 
 			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
-
 			annulerProg();
 		} catch (InvalidObjectException e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -725,9 +728,10 @@ public class FicheEventEditController {
 					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
 
 			MainViewController.getInstance().tv_reper.getItems()
-					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
+					.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(), tempGroupe);
 
 			cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
+			tbv_prog.getItems().remove(tbv_prog.getSelectionModel().getSelectedItem());
 
 			try {
 				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
