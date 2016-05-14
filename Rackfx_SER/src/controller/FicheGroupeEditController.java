@@ -361,7 +361,6 @@ public class FicheGroupeEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO
 			e.printStackTrace();
 		}
 	}
@@ -634,7 +633,6 @@ public class FicheGroupeEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -678,7 +676,6 @@ public class FicheGroupeEditController {
 			try {
 				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			annulerPersonne();
@@ -811,7 +808,6 @@ public class FicheGroupeEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -851,7 +847,6 @@ public class FicheGroupeEditController {
 			try {
 				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			annulerTitre();

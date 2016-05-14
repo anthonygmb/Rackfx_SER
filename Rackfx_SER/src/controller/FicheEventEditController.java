@@ -372,7 +372,6 @@ public class FicheEventEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ValidateurExeption e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -529,7 +528,6 @@ public class FicheEventEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO
 			e.printStackTrace();
 		}
 	}
@@ -571,7 +569,6 @@ public class FicheEventEditController {
 			try {
 				Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			annulerOrganisateur();
@@ -655,27 +652,28 @@ public class FicheEventEditController {
 					.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex());
 			representation.validateObject();
 			Validateur.valideTime(ltp_h_deb_prog.getLocalTime(), ltp_h_fin_prog.getLocalTime());
-			
+
 			if (tbv_prog.getSelectionModel().getSelectedItem() == null) {
-				
+
 				rencontre.addRepresentationToList(representation);
 				tempGroupe.addRepresentationToList(representation);
 				tbv_prog.getItems().add(representation);
-				
+
 			} else {
-//				rencontre.setRepresentationToList(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
-//				MainViewController.getInstance().tv_reper.getItems()
-//				.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
-//				.setRepresentationToList(representation);//TODO
+				// rencontre.setRepresentationToList(tbv_prog.getSelectionModel().getSelectedIndex(),
+				// representation);
+				// MainViewController.getInstance().tv_reper.getItems()
+				// .get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
+				// .setRepresentationToList(representation);//TODO
 
 				tbv_prog.getItems().set(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
 			}
-			
+
 			MainViewController.getInstance().tv_planif.getItems()
-			.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
-			
+					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+
 			MainViewController.getInstance().tv_reper.getItems()
-			.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
 
 			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
@@ -686,7 +684,6 @@ public class FicheEventEditController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ValidateurExeption e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -723,12 +720,12 @@ public class FicheEventEditController {
 			Groupe tempGroupe = MainViewController.getInstance().tv_reper.getItems()
 					.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex());
 			tempGroupe.removeRepresentationToList(tbv_prog.getSelectionModel().getSelectedItem());
-			
+
 			MainViewController.getInstance().tv_planif.getItems()
-			.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
-			
+					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+
 			MainViewController.getInstance().tv_reper.getItems()
-			.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
 
 			cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
 
@@ -736,7 +733,6 @@ public class FicheEventEditController {
 				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 				Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			annulerProg();

@@ -114,7 +114,7 @@ public final class MainViewController {
 		}
 
 		/* récupération des listes de groupes, de rencontres et de users */
-		for (Groupe groupe : tv_reper.getItems()) { // TODO reecrire les noms
+		for (Groupe groupe : tv_reper.getItems()) {
 			groupe.setNom_groupe(groupe.getNom_groupe());
 			for (int j = 0; j < groupe.getListe_titre().size(); j++) {
 				groupe.getListe_titre().get(j).setTitre(groupe.getListe_titre().get(j).getTitre());
@@ -124,6 +124,9 @@ public final class MainViewController {
 		}
 		for (Rencontre rencontre : tv_planif.getItems()) {
 			rencontre.setNom_renc(rencontre.getNom_renc());
+			rencontre.setDate_deb_renc(rencontre.getDate_deb_renc());
+			rencontre.setDate_fin_renc(rencontre.getDate_fin_renc());
+			rencontre.setVille_renc(rencontre.getVille_renc());
 			for (int j = 0; j < rencontre.getListe_representation().size(); j++) {
 				rencontre.getListe_representation().get(j)
 						.setHeure_debut(rencontre.getListe_representation().get(j).getHeure_debut());
@@ -552,7 +555,6 @@ public final class MainViewController {
 					Crud.Serialize(tv_reper.getItems());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -572,17 +574,8 @@ public final class MainViewController {
 			lb_carac_groupe.setText(groupe.getCarac_groupe());
 			lb_pays_groupe.setText(groupe.getPays_groupe());
 			lb_region_groupe.setText(groupe.getRegion_groupe());
-			// if (groupe.getListe_personne() != null &&
-			// groupe.getListe_personne().size() > 0) {
 			lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
-			// }
-			// if (groupe.getListe_titre() != null &&
-			// groupe.getListe_titre().size() > 0) {
 			lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
-			// }
-
-			// if (groupe.getListe_representation() != null &&
-			// groupe.getListe_representation().size() > 0) {
 			for (Representation repreTri : groupe.getListe_representation()) {
 				for (Rencontre rencontre : tv_planif.getItems()) {
 					for (Representation repre : rencontre.getListe_representation()) {
@@ -599,7 +592,6 @@ public final class MainViewController {
 					rencontreDataP.add(rencTri);
 				}
 			}
-			// }
 
 			lb_nb_event_futur.setText(String.valueOf(rencontreDataF.size()));
 			lb_nb_event_passe.setText(String.valueOf(rencontreDataP.size()));
@@ -700,7 +692,6 @@ public final class MainViewController {
 					Crud.Serialize(tv_planif.getItems());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -803,7 +794,6 @@ public final class MainViewController {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -851,7 +841,6 @@ public final class MainViewController {
 				Crud.Serialize(tv_admin.getItems());
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
