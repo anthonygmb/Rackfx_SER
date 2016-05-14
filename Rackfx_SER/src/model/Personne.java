@@ -5,7 +5,7 @@ import java.io.ObjectInputValidation;
 import java.io.Serializable;
 import java.sql.Date;
 
-public class Personne implements Serializable, ObjectInputValidation {
+public class Personne extends Groupe implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = -7815741770942733167L;
 	private String nom_membre;
@@ -20,27 +20,6 @@ public class Personne implements Serializable, ObjectInputValidation {
 	private String tel_cor;
 	private String fax_cor;
 	private String mail_cor;
-
-	public Personne() {
-		this(null, null, false, null, null, null, null, false, null, null, null, null);
-	}
-
-	public Personne(String nom_membre, String prenom_membre, boolean civi_membre, Date date_naiss_membre,
-			String spe_membre, String instru_membre, String respon_membre, boolean correspondant, String adresse_cor,
-			String tel_cor, String fax_cor, String mail_cor) {
-		this.nom_membre = nom_membre;
-		this.prenom_membre = prenom_membre;
-		this.civi_membre = civi_membre;
-		this.date_naiss_membre = date_naiss_membre;
-		this.spe_membre = spe_membre;
-		this.instru_membre = instru_membre;
-		this.respon_membre = respon_membre;
-		this.correspondant = correspondant;
-		this.adresse_cor = adresse_cor;
-		this.tel_cor = tel_cor;
-		this.fax_cor = fax_cor;
-		this.mail_cor = mail_cor;
-	}
 
 	// =================================================================================================
 	public String getNom_membre() {

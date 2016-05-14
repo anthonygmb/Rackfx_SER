@@ -17,16 +17,6 @@ public class User implements Serializable, ObjectInputValidation {
 	private transient StringProperty mot_de_passeProp;
 	private transient StringProperty droit_authProp;
 
-	public User() {
-		this(null, null, null);
-	}
-
-	public User(String login, String mot_de_passe, String droit_auth) {
-		this.login = login;
-		this.mot_de_passe = mot_de_passe;
-		this.droit_auth = droit_auth;
-	}
-
 	// =================================================================================================
 	public String getLogin() {
 		return login;

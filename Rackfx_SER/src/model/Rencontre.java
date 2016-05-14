@@ -4,7 +4,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputValidation;
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.Hashtable;
+import java.util.ArrayList;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -27,25 +27,8 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 	private transient ObjectProperty<Date> date_fin_rencProp;
 	private String periodicite_renc;
 	private Long nb_pers_attendues;
-	private Hashtable<Integer, Organisateur> liste_orgaSER = new Hashtable<Integer, Organisateur>();
-	private Hashtable<Integer, Representation> liste_representationSER = new Hashtable<Integer, Representation>();
-	private transient ObservableList<Organisateur> liste_orga = FXCollections.observableArrayList();
-	private transient ObservableList<Representation> liste_repre = FXCollections.observableArrayList();
-
-	public Rencontre() {
-		this(null, null, null, null, null, null, 0);
-	}
-
-	public Rencontre(String nom_renc, String ville_renc, String lieu_renc, Date date_deb_renc, Date date_fin_renc,
-			String periodicite_renc, long nb_pers_attendues) {
-		this.nom_renc = nom_renc;
-		this.ville_renc = ville_renc;
-		this.lieu_renc = lieu_renc;
-		this.date_deb_renc = date_deb_renc;
-		this.date_fin_renc = date_fin_renc;
-		this.periodicite_renc = periodicite_renc;
-		this.nb_pers_attendues = nb_pers_attendues;
-	}
+	private ArrayList<Organisateur> liste_organisateur = new ArrayList<>();
+	private ArrayList<Representation> liste_representation = new ArrayList<>();
 
 	// =================================================================================================
 	public String getNom_renc() {
@@ -131,35 +114,45 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 	}
 
 	// =================================================================================================
-	public ObservableList<Organisateur> getListe_orga() {
-		liste_orga.clear();
-		for (int i = 0; i < this.liste_orgaSER.size(); i++) {
-			liste_orga.add(this.liste_orgaSER.get(i));
+	public ObservableList<Organisateur> getListe_organisateur() {
+		ObservableList<Organisateur> liste_organisateurO = FXCollections.observableArrayList();
+		for (Organisateur organisateur : liste_organisateur) {
+			liste_organisateurO.add(organisateur);
 		}
-		return liste_orga;
+		return liste_organisateurO;
 	}
 
-	public void setListe_orga(ObservableList<Organisateur> liste_orga) {
-		this.liste_orga = liste_orga;
-		for (int i = 0; i < this.liste_repre.size(); i++) {
-			liste_orgaSER.put(i, this.liste_orga.get(i));
-		}
+	public void addOrganisateurToList(Organisateur organisateur) {
+		this.liste_organisateur.add(organisateur);
+	}
+
+	public void setOrganisateurToList(int index, Organisateur organisateur) {
+		this.liste_organisateur.set(index, organisateur);
+	}
+
+	public void removeOrganisateurToList(Organisateur organisateur) {
+		this.liste_organisateur.remove(organisateur);
 	}
 
 	// =================================================================================================
-	public ObservableList<Representation> getListe_repre() {
-		liste_repre.clear();
-		for (int i = 0; i < this.liste_representationSER.size(); i++) {
-			liste_repre.add(this.liste_representationSER.get(i));
+	public ObservableList<Representation> getListe_representation() {
+		ObservableList<Representation> liste_RepresentationO = FXCollections.observableArrayList();
+		for (Representation representation : liste_representation) {
+			liste_RepresentationO.add(representation);
 		}
-		return liste_repre;
+		return liste_RepresentationO;
 	}
 
-	public void setListe_repre(ObservableList<Representation> liste_repre) {
-		this.liste_repre = liste_repre;
-		for (int i = 0; i < this.liste_repre.size(); i++) {
-			liste_representationSER.put(i, this.liste_repre.get(i));
-		}
+	public void addRepresentationToList(Representation representation) {
+		this.liste_representation.add(representation);
+	}
+
+	public void setRepresentationToList(int index, Representation representation) {
+		this.liste_representation.set(index, representation);
+	}
+
+	public void removeRepresentationToList(Representation representation) {
+		this.liste_representation.remove(representation);
 	}
 
 	// =================================================================================================

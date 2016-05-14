@@ -10,15 +10,6 @@ public class Parametres implements Serializable, ObjectInputValidation {
 	private String langue;
 	private String theme;
 
-	public Parametres() {
-		this(null, null);
-	}
-
-	public Parametres(String langue, String theme) {
-		this.langue = langue;
-		this.theme = theme;
-	}
-
 	// =================================================================================================
 	public String getLangue() {
 		return langue;

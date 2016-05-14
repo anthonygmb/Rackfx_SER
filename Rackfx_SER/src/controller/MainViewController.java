@@ -97,20 +97,49 @@ public final class MainViewController {
 		// fullTextSession.createIndexer().startAndWait();
 		// fullTextSession.close();
 
-		/* récupération des listes de groupes, de rencontres et de users */
-		for (Groupe groupe : MainApp.getInstance().groupeData) {
-			groupe.setNom_groupe(groupe.getNom_groupe());
+		try {
+			tv_reper.setItems(Crud.Deserialize(Groupe.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde groupes trouvé\n");
 		}
-		for (Rencontre rencontre : MainApp.getInstance().rencontreData) {
-			rencontre.setNom_renc(rencontre.getNom_renc());
+		try {
+			tv_planif.setItems(Crud.Deserialize(Rencontre.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde rencontres trouvé\n");
 		}
-		for (User user : MainApp.getInstance().userData) {
-			user.setLogin(user.getLogin());
+		try {
+			tv_admin.setItems(Crud.Deserialize(User.class));
+		} catch (ClassNotFoundException | IOException e) {
+			System.out.printf("Aucun fichier de sauvegarde utilisateurs trouvé\n");
 		}
 
-		tv_reper.setItems(MainApp.getInstance().groupeData);
-		tv_planif.setItems(MainApp.getInstance().rencontreData);
-		tv_admin.setItems(MainApp.getInstance().userData);
+		/* récupération des listes de groupes, de rencontres et de users */
+		for (Groupe groupe : tv_reper.getItems()) { // TODO reecrire les noms
+			groupe.setNom_groupe(groupe.getNom_groupe());
+			for (int j = 0; j < groupe.getListe_titre().size(); j++) {
+				groupe.getListe_titre().get(j).setTitre(groupe.getListe_titre().get(j).getTitre());
+				groupe.getListe_titre().get(j).setAnnee(groupe.getListe_titre().get(j).getAnnee());
+				groupe.getListe_titre().get(j).setDuree(groupe.getListe_titre().get(j).getDuree());
+			}
+		}
+		for (Rencontre rencontre : tv_planif.getItems()) {
+			rencontre.setNom_renc(rencontre.getNom_renc());
+			for (int j = 0; j < rencontre.getListe_representation().size(); j++) {
+				rencontre.getListe_representation().get(j)
+						.setHeure_debut(rencontre.getListe_representation().get(j).getHeure_debut());
+				rencontre.getListe_representation().get(j)
+						.setHeure_fin(rencontre.getListe_representation().get(j).getHeure_fin());
+				rencontre.getListe_representation().get(j)
+						.setNom_Groupe(rencontre.getListe_representation().get(j).getNom_Groupe());
+				rencontre.getListe_representation().get(j)
+						.setNom_Titre(rencontre.getListe_representation().get(j).getNom_Titre());
+			}
+		}
+		for (User user : tv_admin.getItems()) {
+			user.setLogin(user.getLogin());
+			user.setMot_de_passe(user.getMot_de_passe());
+			user.setDroit_auth(user.getDroit_auth());
+		}
 
 		/* récupération du nombre d'utilisateurs et d'administrateurs */
 		countUser();
@@ -119,7 +148,7 @@ public final class MainViewController {
 		 * listener pour mettre à jour le nombre d'utilisateurs et
 		 * d'administrateurs
 		 */
-		MainApp.getInstance().userData.addListener(new ListChangeListener<User>() {
+		tv_admin.getItems().addListener(new ListChangeListener<User>() {
 
 			@Override
 			public void onChanged(javafx.collections.ListChangeListener.Change<? extends User> c) {
@@ -188,12 +217,12 @@ public final class MainViewController {
 			}
 
 			/* Test de connection */
-			for (int i = 0; i < MainApp.getInstance().userData.size(); i++) {
-				if (tf_login.getText().equals(MainApp.getInstance().userData.get(i).getLogin())
+			for (int i = 0; i < tv_admin.getItems().size(); i++) {
+				if (tf_login.getText().equals(tv_admin.getItems().get(i).getLogin())
 						&& CryptEtDecrypt.getSecurePassword(pwf_mdp.getText(), salt)
-								.equals(MainApp.getInstance().userData.get(i).getMot_de_passe())) {
+								.equals(tv_admin.getItems().get(i).getMot_de_passe())) {
 
-					if (MainApp.getInstance().userData.get(i).getDroit_auth().equals("administrateur")) {
+					if (tv_admin.getItems().get(i).getDroit_auth().equals("administrateur")) {
 						connectAdmin = true;
 					} else {
 						connectUser = true;
@@ -468,13 +497,7 @@ public final class MainViewController {
 	private Label lb_nb_event_passe;
 	@FXML
 	private ImageView img_view_main;
-	// private ObservableList<Representation> repreDataTri =
-	// FXCollections.observableArrayList();
 	private ObservableList<Rencontre> rencontreDataTri = FXCollections.observableArrayList();
-	// public ObservableList<Personne> personneData =
-	// FXCollections.observableArrayList();
-	// public ObservableList<Titre> titreData =
-	// FXCollections.observableArrayList();
 	public ObservableList<Rencontre> rencontreDataF = FXCollections.observableArrayList();
 	public ObservableList<Rencontre> rencontreDataP = FXCollections.observableArrayList();
 	private Date auj = new Date();
@@ -486,7 +509,6 @@ public final class MainViewController {
 	 * <code>showFicheGroupeEditDialog</code> Fait appel à la méthode
 	 * <code>getGroupeData</code> Sauve le groupe en base de donnée via
 	 * Hibernate.
-	 * 
 	 */
 	@FXML
 	private void nouveauGroupe() {
@@ -517,7 +539,6 @@ public final class MainViewController {
 	 * Appelé quand l'utilisateur clique sur le bouton Supprimer de l'onglet
 	 * repertoire de la fenetre principale. Necessite de selectionner un groupe
 	 * dans la liste de groupes autrement un message d'erreur apparait.
-	 * 
 	 */
 	@FXML
 	private void supprimerGroupe() {
@@ -551,31 +572,34 @@ public final class MainViewController {
 			lb_carac_groupe.setText(groupe.getCarac_groupe());
 			lb_pays_groupe.setText(groupe.getPays_groupe());
 			lb_region_groupe.setText(groupe.getRegion_groupe());
-//			if (groupe.getListe_personne() != null && groupe.getListe_personne().size() > 0) {
-				lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
-//			}
-//			if (groupe.getListe_titre() != null && groupe.getListe_titre().size() > 0) {
-				lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
-//			}
+			// if (groupe.getListe_personne() != null &&
+			// groupe.getListe_personne().size() > 0) {
+			lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
+			// }
+			// if (groupe.getListe_titre() != null &&
+			// groupe.getListe_titre().size() > 0) {
+			lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
+			// }
 
-//			if (groupe.getListe_representation() != null && groupe.getListe_representation().size() > 0) {
-				for (Representation repreTri : groupe.getListe_representation()) {
-					for (Rencontre rencontre : MainApp.getInstance().rencontreData) {
-						for (Representation repre : rencontre.getListe_repre()) {
-							if (repreTri.getNom_Groupe().equals(repre.getNom_Groupe())) {
-								rencontreDataTri.add(rencontre);
-							}
+			// if (groupe.getListe_representation() != null &&
+			// groupe.getListe_representation().size() > 0) {
+			for (Representation repreTri : groupe.getListe_representation()) {
+				for (Rencontre rencontre : tv_planif.getItems()) {
+					for (Representation repre : rencontre.getListe_representation()) {
+						if (repreTri.getNom_Groupe().equals(repre.getNom_Groupe())) {
+							rencontreDataTri.add(rencontre);
 						}
 					}
 				}
-				for (Rencontre rencTri : rencontreDataTri) {
-					if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
-						rencontreDataF.add(rencTri);
-					} else {
-						rencontreDataP.add(rencTri);
-					}
+			}
+			for (Rencontre rencTri : rencontreDataTri) {
+				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {
+					rencontreDataF.add(rencTri);
+				} else {
+					rencontreDataP.add(rencTri);
 				}
-//			}
+			}
+			// }
 
 			lb_nb_event_futur.setText(String.valueOf(rencontreDataF.size()));
 			lb_nb_event_passe.setText(String.valueOf(rencontreDataP.size()));
@@ -626,10 +650,6 @@ public final class MainViewController {
 	@FXML
 	private Label lb_nb_repre;
 	private SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy");
-	// public ObservableList<Organisateur> orgaData =
-	// FXCollections.observableArrayList();
-	// public ObservableList<Representation> repreData =
-	// FXCollections.observableArrayList();
 
 	/**
 	 * Appelé quand l'utilisateur clique sur le bouton Nouveau de l'onglet
@@ -691,31 +711,14 @@ public final class MainViewController {
 	 * labels de l'onglet planification de la fenetre principale.
 	 */
 	protected void showEventDetails(Rencontre rencontre) {
-		// orgaData.clear();
-		// repreData.clear();
-
 		if (rencontre != null) {
 			lb_lieu.setText(rencontre.getLieu_renc());
 			lb_date_deb.setText(simpleFormat.format(rencontre.getDate_deb_renc()));
 			lb_date_fin.setText(simpleFormat.format(rencontre.getDate_fin_renc()));
 			lb_nb_pers.setText(rencontre.getNb_pers_attendues().toString());
 			lb_perio.setText(rencontre.getPeriodicite_renc());
-			// for (Rencontre renc : MainApp.getInstance().rencontreData) {
-			// for (Organisateur orga : renc.getListe_orga()) {
-			// if (orga.getRencontre().getNom_renc().equals(renc.getNom_renc()))
-			// {
-			// orgaData.add(orga);
-			// }
-			// }
-			// for (Representation repre : renc.getListe_repre()) {
-			// if
-			// (repre.getRencontre().getNom_renc().equals(renc.getNom_renc())) {
-			// repreData.add(repre);
-			// }
-			// }
-			// }
-			lb_nb_orga.setText(String.valueOf(rencontre.getListe_orga().size()));
-			lb_nb_repre.setText(String.valueOf(rencontre.getListe_repre().size()));
+			lb_nb_orga.setText(String.valueOf(rencontre.getListe_organisateur().size()));
+			lb_nb_repre.setText(String.valueOf(rencontre.getListe_representation().size()));
 		} else {
 			lb_lieu.setText("");
 			lb_date_deb.setText("");
@@ -762,7 +765,7 @@ public final class MainViewController {
 		compteurAdmin = 0;
 		compteurUser = 0;
 
-		for (User user : MainApp.getInstance().userData) {
+		for (User user : tv_admin.getItems()) {
 			if (user.getDroit_auth().equals("administrateur")) {
 				compteurAdmin++;
 			} else {

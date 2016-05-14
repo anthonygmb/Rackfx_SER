@@ -3,7 +3,7 @@ package model;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputValidation;
 import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.ArrayList;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -12,30 +12,16 @@ import javafx.collections.ObservableList;
 
 public class Groupe implements Serializable, ObjectInputValidation {
 
-	private static final long serialVersionUID = 2167626103464193289L;
+	private static final long serialVersionUID = 1L;
 	private String nom_groupe;
 	private transient StringProperty nom_groupeProp;
 	private String carac_groupe;
 	private String pays_groupe;
 	private String region_groupe;
-	private Hashtable<Integer, Personne> liste_personneSER = new Hashtable<Integer, Personne>();
-	private Hashtable<Integer, Titre> liste_titreSER = new Hashtable<Integer, Titre>();
-	private Hashtable<Integer, Representation> liste_representationSER = new Hashtable<Integer, Representation>();
-	private transient ObservableList<Personne> liste_personne = FXCollections.observableArrayList();
-	private transient ObservableList<Titre> liste_titre = FXCollections.observableArrayList();
-	private transient ObservableList<Representation> liste_representation = FXCollections.observableArrayList();
+	private ArrayList<Personne> liste_personne = new ArrayList<>();
+	private ArrayList<Titre> liste_titre = new ArrayList<>();
+	private ArrayList<Representation> liste_representation = new ArrayList<>();
 	private byte[] image;
-
-	public Groupe() {
-		this(null, null, null, null);
-	}
-
-	public Groupe(String nomGroupe, String carac_groupe, String pays_groupe, String region_groupe) {
-		this.nom_groupe = nomGroupe;
-		this.carac_groupe = carac_groupe;
-		this.pays_groupe = pays_groupe;
-		this.region_groupe = region_groupe;
-	}
 
 	// =================================================================================================
 	public String getNom_groupe() {
@@ -80,50 +66,65 @@ public class Groupe implements Serializable, ObjectInputValidation {
 
 	// =================================================================================================
 	public ObservableList<Personne> getListe_personne() {
-		liste_personne.clear();
-		for (int i = 0; i < this.liste_personneSER.size(); i++) {
-			liste_personne.add(this.liste_personneSER.get(i));
+		ObservableList<Personne> liste_personneO = FXCollections.observableArrayList();
+		for (Personne personne : liste_personne) {
+			liste_personneO.add(personne);
 		}
-		return liste_personne;
+		return liste_personneO;
 	}
 
-	public void setListe_personne(ObservableList<Personne> liste_personne) {
-		this.liste_personne = liste_personne;
-		for (int i = 0; i < this.liste_personne.size(); i++) {
-			liste_personneSER.put(i, this.liste_personne.get(i));
-		}
+	public void addPersonneToList(Personne personne) {
+		this.liste_personne.add(personne);
+	}
+
+	public void setPersonneToList(int index, Personne personne) {
+		this.liste_personne.set(index, personne);
+	}
+
+	public void removePersonneToList(Personne personne) {
+		this.liste_personne.remove(personne);
 	}
 
 	// =================================================================================================
 	public ObservableList<Titre> getListe_titre() {
-		liste_titre.clear();
-		for (int i = 0; i < this.liste_titreSER.size(); i++) {
-			liste_titre.add(this.liste_titreSER.get(i));
+		ObservableList<Titre> liste_titreO = FXCollections.observableArrayList();
+		for (Titre titre : liste_titre) {
+			liste_titreO.add(titre);
 		}
-		return liste_titre;
+		return liste_titreO;
 	}
 
-	public void setListe_titre(ObservableList<Titre> liste_titre) {
-		this.liste_titre = liste_titre;
-		for (int i = 0; i < this.liste_titre.size(); i++) {
-			liste_titreSER.put(i, this.liste_titre.get(i));
-		}
+	public void addTitreToList(Titre titre) {
+		this.liste_titre.add(titre);
+	}
+
+	public void setTitreToList(int index, Titre titre) {
+		this.liste_titre.set(index, titre);
+	}
+
+	public void removeTitreToList(Titre titre) {
+		this.liste_titre.remove(titre);
 	}
 
 	// =================================================================================================
 	public ObservableList<Representation> getListe_representation() {
-		liste_representation.clear();
-		for (int i = 0; i < this.liste_representationSER.size(); i++) {
-			liste_representation.add(this.liste_representationSER.get(i));
+		ObservableList<Representation> liste_RepresentationO = FXCollections.observableArrayList();
+		for (Representation representation : liste_representation) {
+			liste_RepresentationO.add(representation);
 		}
-		return liste_representation;
+		return liste_RepresentationO;
 	}
 
-	public void setListe_representation(ObservableList<Representation> liste_representation) {
-		this.liste_representation = liste_representation;
-		for (int i = 0; i < this.liste_representation.size(); i++) {
-			liste_representationSER.put(i, this.liste_representation.get(i));
-		}
+	public void addRepresentationToList(Representation representation) {
+		this.liste_representation.add(representation);
+	}
+
+	public void setRepresentationToList(int index, Representation representation) {
+		this.liste_representation.set(index, representation);
+	}
+
+	public void removeRepresentationToList(Representation representation) {
+		this.liste_representation.remove(representation);
 	}
 
 	// =================================================================================================

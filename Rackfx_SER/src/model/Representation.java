@@ -22,17 +22,6 @@ public class Representation implements Serializable, ObjectInputValidation {
 	private transient StringProperty nom_groupeProp;
 	private transient StringProperty nom_titreProp;
 
-	public Representation() {
-		this(null, null, null, null);
-	}
-
-	public Representation(String nom_groupe, String nom_titre, Time heure_debut, Time heure_fin) {
-		this.nom_groupe = nom_groupe;
-		this.nom_titre = nom_titre;
-		this.heure_debut = heure_debut;
-		this.heure_fin = heure_fin;
-	}
-
 	// =================================================================================================
 	public Time getHeure_debut() {
 		return heure_debut;

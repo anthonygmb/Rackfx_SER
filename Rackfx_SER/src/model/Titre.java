@@ -23,19 +23,6 @@ public class Titre implements Serializable, ObjectInputValidation {
 	private boolean reprise_titre;
 	private String auteur;
 
-	public Titre() {
-		this(null, null, null, null, false, null);
-	}
-
-	public Titre(String titre, String annee, Time duree, String genre, boolean reprise_titre, String auteur) {
-		this.titre = titre;
-		this.annee = annee;
-		this.duree = duree;
-		this.genre = genre;
-		this.reprise_titre = reprise_titre;
-		this.auteur = auteur;
-	}
-
 	// =================================================================================================
 	public String getTitre() {
 		return titre;

@@ -21,16 +21,12 @@ import javafx.stage.WindowEvent;
 import model.Groupe;
 import model.Parametres;
 import model.Rencontre;
-import model.User;
 import utilities.Crud;
 import utilities.Validateur;
 
 public final class MainApp extends Application {
 
 	protected Stage primaryStage;
-	protected ObservableList<Groupe> groupeData = FXCollections.observableArrayList();
-	protected ObservableList<Rencontre> rencontreData = FXCollections.observableArrayList();
-	protected ObservableList<User> userData = FXCollections.observableArrayList();
 	protected ObservableList<Parametres> parametresData = FXCollections.observableArrayList();
 	protected final LocalTime def_time = LocalTime.of(0, 0);
 	public ResourceBundle Lang_bundle;
@@ -48,21 +44,6 @@ public final class MainApp extends Application {
 	 * Constructeur
 	 */
 	public MainApp() {
-		try {
-			groupeData.addAll(Crud.Deserialize(Groupe.class));
-		} catch (ClassNotFoundException | IOException e) {
-			System.out.printf("Aucun fichier de sauvegarde groupes trouvé\n");
-		}
-		try {
-			rencontreData.addAll(Crud.Deserialize(Rencontre.class));
-		} catch (ClassNotFoundException | IOException e) {
-			System.out.printf("Aucun fichier de sauvegarde rencontres trouvé\n");
-		}
-		try {
-			userData.addAll(Crud.Deserialize(User.class));
-		} catch (ClassNotFoundException | IOException e) {
-			System.out.printf("Aucun fichier de sauvegarde utilisateurs trouvé\n");
-		}
 		try {
 			parametresData.addAll(Crud.Deserialize(Parametres.class));
 		} catch (ClassNotFoundException | IOException e) {

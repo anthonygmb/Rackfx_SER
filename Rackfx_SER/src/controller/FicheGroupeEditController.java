@@ -344,17 +344,15 @@ public class FicheGroupeEditController {
 			groupe.validateObject();
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouveau.groupe"))) {
 				geleTab(true);
-				MainApp.getInstance().groupeData.add(groupe);
-				MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+				MainViewController.getInstance().tv_reper.getItems().add(groupe);
 				MainViewController.getInstance().tv_reper.getSelectionModel().selectLast();
 			} else {
 				MainViewController.getInstance().showGroupeDetails(groupe);
 				int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-				MainApp.getInstance().groupeData.set(index, groupe);
-				MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+				MainViewController.getInstance().tv_reper.getItems().set(index, groupe);
 				MainViewController.getInstance().tv_reper.getSelectionModel().select(index);
 			}
-			Crud.Serialize(MainApp.getInstance().groupeData);
+			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			dialogStage.setTitle(groupe.getNom_groupe());
 			btn_creer_groupe.setText(Lang_bundle.getString("Appliquer"));
 			cmbox_membre.setItems(groupe.getListe_personne());
@@ -438,7 +436,7 @@ public class FicheGroupeEditController {
 	@FXML
 	private DatePicker dtp_date_naiss_membre;
 	@FXML
-	private ComboBox<Personne> cmbox_membre = new ComboBox<>(/* personneData */);// TODO
+	private ComboBox<Personne> cmbox_membre = new ComboBox<>();
 	@FXML
 	private Button btn_creer_membre;
 	@FXML
@@ -623,15 +621,14 @@ public class FicheGroupeEditController {
 		try {
 			personne.validateObject();
 			if (cmbox_membre.getSelectionModel().getSelectedItem() == null) {
-				groupe.getListe_personne().add(personne);
+				groupe.addPersonneToList(personne);
 			} else {
-				groupe.getListe_personne().set(cmbox_membre.getSelectionModel().getSelectedIndex(), personne);
+				groupe.setPersonneToList(cmbox_membre.getSelectionModel().getSelectedIndex(), personne);
 			}
-			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().groupeData.set(index, groupe);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			MainViewController.getInstance().tv_reper.getItems()
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), groupe);
 			cmbox_membre.setItems(groupe.getListe_personne());
-			Crud.Serialize(MainApp.getInstance().groupeData);
+			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			annulerPersonne();
 		} catch (InvalidObjectException e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -674,13 +671,12 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.membre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			groupe.getListe_personne().remove(cmbox_membre.getSelectionModel().getSelectedItem());
-			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().groupeData.set(index, groupe);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			groupe.removePersonneToList(cmbox_membre.getSelectionModel().getSelectedItem());
+			MainViewController.getInstance().tv_reper.getItems()
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), groupe);
 			cmbox_membre.setItems(groupe.getListe_personne());
 			try {
-				Crud.Serialize(MainApp.getInstance().groupeData);
+				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -701,7 +697,7 @@ public class FicheGroupeEditController {
 	@FXML
 	private Button btn_supp_titre;
 	@FXML
-	private TableView<Titre> tbv_titre = new TableView<>(/*titreData*/);//TODO
+	private TableView<Titre> tbv_titre = new TableView<>();
 	@FXML
 	private TableColumn<Titre, String> col_titre_titre;
 	@FXML
@@ -802,15 +798,14 @@ public class FicheGroupeEditController {
 		try {
 			titre.validateObject();
 			if (tbv_titre.getSelectionModel().getSelectedItem() == null) {
-				groupe.getListe_titre().add(titre);
+				groupe.addTitreToList(titre);
 			} else {
-				groupe.getListe_titre().set(tbv_titre.getSelectionModel().getSelectedIndex(), titre);
+				groupe.setTitreToList(tbv_titre.getSelectionModel().getSelectedIndex(), titre);
 			}
-			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().groupeData.set(index, groupe);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			MainViewController.getInstance().tv_reper.getItems()
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), groupe);
 			tbv_titre.setItems(groupe.getListe_titre());
-			Crud.Serialize(MainApp.getInstance().groupeData);
+			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			annulerTitre();
 		} catch (InvalidObjectException e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -849,13 +844,12 @@ public class FicheGroupeEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.ce.titre.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			groupe.getListe_titre().remove(tbv_titre.getSelectionModel().getSelectedItem());
-			int index = MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().groupeData.set(index, groupe);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
+			groupe.removeTitreToList(tbv_titre.getSelectionModel().getSelectedItem());
+			MainViewController.getInstance().tv_reper.getItems()
+					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), groupe);
 			tbv_titre.setItems(groupe.getListe_titre());
 			try {
-				Crud.Serialize(MainApp.getInstance().groupeData);
+				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -881,15 +875,6 @@ public class FicheGroupeEditController {
 	private TableColumn<Rencontre, java.sql.Date> col_deb_event_f;
 	@FXML
 	private TableColumn<Rencontre, java.sql.Date> col_fin_event_f;
-
-//	/**
-//	 * récupération de la liste de rencontres pour les placer dans les tableaux
-//	 * d'événements futurs et passés
-//	 */
-//	private void loadRencontres() {
-//		tbv_event_f.setItems(MainViewController.getInstance().rencontreDataF);
-//		tbv_event_p.setItems(MainViewController.getInstance().rencontreDataP);
-//	}
 
 	/*
 	 * =========================================================================

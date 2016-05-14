@@ -16,22 +16,6 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 	private String mail_orga;
 	private String entreprise_orga;
 
-	public Organisateur() {
-		this(null, null, false, null, null, null, null, null);
-	}
-
-	public Organisateur(String nom_orga, String prenom_orga, boolean civi_orga, String adresse_entreprise_orga,
-			String tel_orga, String fax_orga, String mail_orga, String entreprise_orga) {
-		this.nom_orga = nom_orga;
-		this.prenom_orga = prenom_orga;
-		this.civi_orga = civi_orga;
-		this.adresse_entreprise_orga = adresse_entreprise_orga;
-		this.tel_orga = tel_orga;
-		this.fax_orga = fax_orga;
-		this.mail_orga = mail_orga;
-		this.entreprise_orga = entreprise_orga;
-	}
-
 	// =================================================================================================
 	public String getNom_orga() {
 		return nom_orga;

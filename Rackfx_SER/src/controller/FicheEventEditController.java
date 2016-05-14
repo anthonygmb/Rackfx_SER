@@ -210,7 +210,7 @@ public class FicheEventEditController {
 			}
 		});
 
-		cmbox_groupe_event.setItems(MainApp.getInstance().groupeData);
+		cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
 		cmbox_groupe_event.valueProperty().addListener(new ChangeListener<Groupe>() {
 			@Override
 			public void changed(ObservableValue<? extends Groupe> observable, Groupe oldValue, Groupe newValue) {
@@ -271,16 +271,6 @@ public class FicheEventEditController {
 		this.dialogStage = dialogStage;
 	}
 
-	// /**
-	// * Méthode de mise à jour des entités enfants
-	// */
-	// private void loadChildren() {
-	// orgaData.setAll(MainViewController.getInstance().orgaData);
-	// repreData.setAll(MainViewController.getInstance().repreData);
-	// cmbox_orga.setItems(orgaData);
-	// tbv_prog.setItems(repreData);
-	// }
-
 	/*
 	 * =========================================================================
 	 * ONGLET INFORMATIONS
@@ -338,9 +328,8 @@ public class FicheEventEditController {
 		}
 		cmbox_perio_event.getItems().addAll(Res_listes.perio_event);
 		btn_creer_event.setText((modif) ? Lang_bundle.getString("Appliquer") : Lang_bundle.getString("Creer"));
-		// loadChildren();
-		cmbox_orga.setItems(rencontre.getListe_orga());
-		tbv_prog.setItems(rencontre.getListe_repre());
+		cmbox_orga.setItems(rencontre.getListe_organisateur());
+		tbv_prog.setItems(rencontre.getListe_representation());
 	}
 
 	/**
@@ -366,21 +355,19 @@ public class FicheEventEditController {
 			Validateur.valideDate(dt_debut_event.getValue(), dt_fin_event.getValue());
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouvelle.rencontre"))) {
 				geleTab(true);
-				MainApp.getInstance().rencontreData.add(rencontre);
-				MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
+				MainViewController.getInstance().tv_planif.getItems().add(rencontre);
 				MainViewController.getInstance().tv_planif.getSelectionModel().selectLast();
 			} else {
 				MainViewController.getInstance().showEventDetails(rencontre);
 				int index = MainViewController.getInstance().tv_planif.getSelectionModel().getFocusedIndex();
-				MainApp.getInstance().rencontreData.set(index, rencontre);
-				MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
+				MainViewController.getInstance().tv_planif.getItems().set(index, rencontre);
 				MainViewController.getInstance().tv_planif.getSelectionModel().select(index);
 			}
-			Crud.Serialize(MainApp.getInstance().rencontreData);
+			Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			dialogStage.setTitle(rencontre.getNom_renc());
 			btn_creer_event.setText(Lang_bundle.getString("Appliquer"));
-			cmbox_orga.setItems(rencontre.getListe_orga());
-			tbv_prog.setItems(rencontre.getListe_repre());
+			cmbox_orga.setItems(rencontre.getListe_organisateur());
+			tbv_prog.setItems(rencontre.getListe_representation());
 		} catch (InvalidObjectException e) {
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
 					e.getMessage()).showAndWait();
@@ -426,10 +413,8 @@ public class FicheEventEditController {
 	private TextField tf_mail_orga;
 	@FXML
 	private TextField tf_entreprise_orga;
-	// private ObservableList<Organisateur> orgaData =
-	// FXCollections.observableArrayList();
 	@FXML
-	private ComboBox<Organisateur> cmbox_orga = new ComboBox<>(/* orgaData */);// TODO
+	private ComboBox<Organisateur> cmbox_orga = new ComboBox<>();
 	@FXML
 	private Button btn_creer_orga;
 	@FXML
@@ -531,15 +516,14 @@ public class FicheEventEditController {
 		try {
 			organisateur.validateObject();
 			if (cmbox_orga.getSelectionModel().getSelectedItem() == null) {
-				rencontre.getListe_orga().add(organisateur);
+				rencontre.addOrganisateurToList(organisateur);
 			} else {
-				rencontre.getListe_orga().set(cmbox_orga.getSelectionModel().getSelectedIndex(), organisateur);
+				rencontre.setOrganisateurToList(cmbox_orga.getSelectionModel().getSelectedIndex(), organisateur);
 			}
-			int index = MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().rencontreData.set(index, rencontre);
-			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
-			cmbox_orga.setItems(rencontre.getListe_orga());
-			Crud.Serialize(MainApp.getInstance().rencontreData);
+			MainViewController.getInstance().tv_planif.getItems()
+					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+			cmbox_orga.setItems(rencontre.getListe_organisateur());
+			Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			annulerOrganisateur();
 		} catch (InvalidObjectException e) { /* si la validation a échoué */
 			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
@@ -580,12 +564,12 @@ public class FicheEventEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.cet.organisateur.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			rencontre.getListe_orga().remove(cmbox_orga.getSelectionModel().getSelectedItem());
-			int index = MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex();
-			MainApp.getInstance().rencontreData.set(index, rencontre);
-			cmbox_orga.setItems(rencontre.getListe_orga());
+			rencontre.removeOrganisateurToList(cmbox_orga.getSelectionModel().getSelectedItem());
+			MainViewController.getInstance().tv_planif.getItems()
+					.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+			cmbox_orga.setItems(rencontre.getListe_organisateur());
 			try {
-				Crud.Serialize(MainApp.getInstance().groupeData);
+				Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -604,10 +588,8 @@ public class FicheEventEditController {
 	private Button btn_creer_prog;
 	@FXML
 	private Button btn_supp_prog;
-	// private ObservableList<Representation> repreData =
-	// FXCollections.observableArrayList();
 	@FXML
-	private TableView<Representation> tbv_prog = new TableView<>(/* repreData */);// TODO
+	private TableView<Representation> tbv_prog = new TableView<>();
 	@FXML
 	private TableColumn<Representation, String> col_groupe_prog;
 	@FXML
@@ -617,13 +599,9 @@ public class FicheEventEditController {
 	@FXML
 	private TableColumn<Representation, Time> col_fin_prog;
 	@FXML
-	private ComboBox<Groupe> cmbox_groupe_event = new ComboBox<>(MainApp.getInstance().groupeData);
+	private ComboBox<Groupe> cmbox_groupe_event = new ComboBox<>(MainViewController.getInstance().tv_reper.getItems());
 	@FXML
-	private ComboBox<Titre> cmbox_titre_event = new ComboBox<>(/*
-																 * MainViewController
-																 * .getInstance(
-																 * ).titreData
-																 */);// TODO
+	private ComboBox<Titre> cmbox_titre_event = new ComboBox<>();
 	@FXML
 	private LocalTimePicker ltp_h_deb_prog;
 	@FXML
@@ -639,7 +617,7 @@ public class FicheEventEditController {
 			annulerProg();
 		} else {
 			representation = tbv_prog.getSelectionModel().getSelectedItem();
-			for (Groupe groupeIt : MainApp.getInstance().groupeData) {
+			for (Groupe groupeIt : MainViewController.getInstance().tv_reper.getItems()) {
 				if (representation.getNom_Groupe().equals(groupeIt.getNom_groupe())) {
 					cmbox_groupe_event.getSelectionModel().select(groupeIt);
 				}
@@ -649,12 +627,6 @@ public class FicheEventEditController {
 					}
 				}
 			}
-			// for (Titre titreiT : MainViewController.getInstance().titreData)
-			// {
-			// if (representation.getNom_Titre().equals(titreiT.getTitre())) {
-			// cmbox_titre_event.getSelectionModel().select(titreiT);
-			// }
-			// }
 			ltp_h_deb_prog.setLocalTime(representation.getHeure_debut().toLocalTime());
 			ltp_h_fin_prog.setLocalTime(representation.getHeure_fin().toLocalTime());
 			btn_creer_prog.setText(Lang_bundle.getString("Appliquer"));
@@ -679,27 +651,35 @@ public class FicheEventEditController {
 		representation.setHeure_fin(java.sql.Time.valueOf(ltp_h_fin_prog.getLocalTime()));
 
 		try {
+			Groupe tempGroupe = MainViewController.getInstance().tv_reper.getItems()
+					.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex());
 			representation.validateObject();
 			Validateur.valideTime(ltp_h_deb_prog.getLocalTime(), ltp_h_fin_prog.getLocalTime());
+			
 			if (tbv_prog.getSelectionModel().getSelectedItem() == null) {
+				
+				rencontre.addRepresentationToList(representation);
+				tempGroupe.addRepresentationToList(representation);
 				tbv_prog.getItems().add(representation);
+				
 			} else {
+//				rencontre.setRepresentationToList(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
+//				MainViewController.getInstance().tv_reper.getItems()
+//				.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
+//				.setRepresentationToList(representation);//TODO
+
 				tbv_prog.getItems().set(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
 			}
-			rencontre.getListe_repre().add(representation);
-			cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_representation().add(representation);
+			
+			MainViewController.getInstance().tv_planif.getItems()
+			.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+			
+			MainViewController.getInstance().tv_reper.getItems()
+			.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
 
-			MainApp.getInstance().groupeData.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(),
-					cmbox_groupe_event.getSelectionModel().getSelectedItem());
-			MainApp.getInstance().rencontreData
-					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), rencontre);
-
-			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
-
-			Crud.Serialize(MainApp.getInstance().groupeData);
-			Crud.Serialize(MainApp.getInstance().rencontreData);
-			cmbox_groupe_event.setItems(MainApp.getInstance().groupeData);
+			Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
+			Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
+			cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
 
 			annulerProg();
 		} catch (InvalidObjectException e) {
@@ -739,23 +719,22 @@ public class FicheEventEditController {
 				Lang_bundle.getString("Confirmation.d'action"), Lang_bundle.getString("Confirmation.de.suppression"),
 				Lang_bundle.getString("Voulez-vous.supprimer.cette.representation.?")).showAndWait();
 		if (MainViewController.getInstance().result.get() == ButtonType.OK) {
-			rencontre.getListe_repre().remove(tbv_prog.getSelectionModel().getSelectedItem());
-			cmbox_groupe_event.getSelectionModel().getSelectedItem().getListe_representation()
-					.remove(tbv_prog.getSelectionModel().getSelectedItem());
-
-			MainApp.getInstance().groupeData.set(cmbox_groupe_event.getSelectionModel().getSelectedIndex(),
-					cmbox_groupe_event.getSelectionModel().getSelectedItem());
-			MainApp.getInstance().rencontreData
-					.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), rencontre);
-
-			MainViewController.getInstance().tv_planif.setItems(MainApp.getInstance().rencontreData);
-			MainViewController.getInstance().tv_reper.setItems(MainApp.getInstance().groupeData);
-
-			cmbox_groupe_event.setItems(MainApp.getInstance().groupeData);
+			rencontre.removeRepresentationToList(tbv_prog.getSelectionModel().getSelectedItem());
+			Groupe tempGroupe = MainViewController.getInstance().tv_reper.getItems()
+					.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex());
+			tempGroupe.removeRepresentationToList(tbv_prog.getSelectionModel().getSelectedItem());
 			
+			MainViewController.getInstance().tv_planif.getItems()
+			.set(MainViewController.getInstance().tv_planif.getSelectionModel().getSelectedIndex(), rencontre);
+			
+			MainViewController.getInstance().tv_reper.getItems()
+			.set(MainViewController.getInstance().tv_reper.getSelectionModel().getSelectedIndex(), tempGroupe);
+
+			cmbox_groupe_event.setItems(MainViewController.getInstance().tv_reper.getItems());
+
 			try {
-				Crud.Serialize(MainApp.getInstance().groupeData);
-				Crud.Serialize(MainApp.getInstance().rencontreData);
+				Crud.Serialize(MainViewController.getInstance().tv_reper.getItems());
+				Crud.Serialize(MainViewController.getInstance().tv_planif.getItems());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
