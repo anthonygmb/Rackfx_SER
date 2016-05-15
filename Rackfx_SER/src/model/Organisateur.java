@@ -79,7 +79,7 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 		this.mail_orga = mail_orga;
 	}
 
-	// =================================================================================================
+	// =================================================================================================F
 	public String getEntreprise_orga() {
 		return entreprise_orga;
 	}

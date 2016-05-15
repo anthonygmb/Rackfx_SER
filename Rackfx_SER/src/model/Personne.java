@@ -7,7 +7,7 @@ import java.sql.Date;
 
 import controller.FicheGroupeEditController;
 
-public class Personne extends Groupe implements Serializable, ObjectInputValidation {
+public class Personne implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = -7815741770942733167L;
 	private String nom_membre;
