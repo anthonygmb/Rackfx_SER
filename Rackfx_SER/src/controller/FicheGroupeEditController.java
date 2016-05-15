@@ -55,7 +55,7 @@ public class FicheGroupeEditController {
 	private String telNumber = "";
 	private String faxNumber = "";
 	private DateFormat formatAnnee = new SimpleDateFormat("yyyy");
-	private Date auj = new Date();
+	public Date auj = new Date();
 	private String annee = "";
 	private Image imageOrigine;
 	private ResourceBundle Lang_bundle;
@@ -63,9 +63,6 @@ public class FicheGroupeEditController {
 	private Label vide2;
 	private Label vide3;
 
-	/**
-	 * Constructeur.
-	 */
 	public FicheGroupeEditController() {
 	}
 
@@ -84,9 +81,41 @@ public class FicheGroupeEditController {
 	 */
 	@FXML
 	private void initialize() {
+
+		// GENERAL ===============================================
 		INSTANCE_FICHE_GROUPE_CONTROLLER = this;
 		this.Lang_bundle = MainApp.getInstance().Lang_bundle;
 
+		vide1 = new Label(Lang_bundle.getString("vide"));
+		vide2 = new Label(Lang_bundle.getString("vide"));
+		vide3 = new Label(Lang_bundle.getString("vide"));
+		tbv_titre.setPlaceholder(vide1);
+		tbv_event_f.setPlaceholder(vide2);
+		tbv_event_p.setPlaceholder(vide3);
+
+		btn_creer_groupe.setDisable(true);
+		btn_creer_membre.setDisable(true);
+		btn_supp_membre.setDisable(true);
+		btn_creer_titre.setDisable(true);
+		btn_supp_titre.setDisable(true);
+		bt_import_img.setDisable(true);
+		bt_supp_img.setDisable(true);
+
+		if (MainViewController.getInstance().connectAdmin) {
+			btn_creer_groupe.setDisable(false);
+			btn_creer_membre.setDisable(false);
+			btn_supp_membre.setDisable(false);
+			btn_creer_titre.setDisable(false);
+			btn_supp_titre.setDisable(false);
+			bt_import_img.setDisable(false);
+			bt_supp_img.setDisable(false);
+		} else if (MainViewController.getInstance().connectUser) {
+			btn_creer_groupe.setDisable(false);
+			btn_creer_membre.setDisable(false);
+			btn_creer_titre.setDisable(false);
+		}
+
+		// ONGLETS INFOS ===============================================
 		imageOrigine = new Image("file:src/img/cd_music.png");
 
 		img_view.imageProperty().addListener(new ChangeListener<Image>() {
@@ -99,6 +128,81 @@ public class FicheGroupeEditController {
 				} else {
 					bt_import_img.setDisable(false);
 					bt_supp_img.setDisable(true);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_nom_groupe.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_nom_groupe.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_nom_groupe.setText(oldValue);
+				} else {
+					tf_nom_groupe.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_carac_groupe.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_carac_groupe.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_carac_groupe.setText(oldValue);
+				} else {
+					tf_carac_groupe.setText(newValue);
+				}
+			}
+		});
+
+		// ONGLET MEMBRES ===============================================
+		/* limite le textfiel à X caractères */
+		tf_nom_membre.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_nom_membre.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_nom_membre.setText(oldValue);
+				} else {
+					tf_nom_membre.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_prenom_membre.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_prenom_membre.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_prenom_membre.setText(oldValue);
+				} else {
+					tf_prenom_membre.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_adress_cor.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_adress_cor.getText() != null
+						&& newValue.length() > MainApp.getInstance().VALMAX + MainApp.getInstance().VALMAX) {
+					tf_adress_cor.setText(oldValue);
+				} else {
+					tf_adress_cor.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_mail_cor.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_mail_cor.getText() != null
+						&& newValue.length() > MainApp.getInstance().VALMAX + MainApp.getInstance().VALMAX) {
+					tf_mail_cor.setText(oldValue);
+				} else {
+					tf_mail_cor.setText(newValue);
 				}
 			}
 		});
@@ -134,12 +238,6 @@ public class FicheGroupeEditController {
 			}
 		});
 
-		/* valeures par defaut de l'onglet membre */
-		cmbox_spe_membre.getItems().addAll(Res_listes.spe_membre);
-		cmbox_instru_membre.getItems().addAll(Res_listes.instru_membre);
-		cmbox_respon_membre.getItems().addAll(Res_listes.respon_membre);
-		annulerPersonne();
-
 		/* formatte le textfield au format numéro de téléphone */
 		tf_tel_cor.textProperty().addListener(new ChangeListener<String>() {
 			@Override
@@ -166,6 +264,13 @@ public class FicheGroupeEditController {
 		});
 		tf_fax_cor.positionCaret(tf_fax_cor.getLength());
 
+		/* valeures par defaut de l'onglet membre */
+		cmbox_spe_membre.getItems().addAll(Res_listes.spe_membre);
+		cmbox_instru_membre.getItems().addAll(Res_listes.instru_membre);
+		cmbox_respon_membre.getItems().addAll(Res_listes.respon_membre);
+		annulerPersonne();
+
+		// ONGLET TITRES ===============================================
 		/* formatte le tableau de titres */
 		col_titre_titre.setCellValueFactory(cellData -> cellData.getValue().titreProperty());
 		col_annee_titre.setCellValueFactory(cellData -> cellData.getValue().anneeProperty());
@@ -175,6 +280,43 @@ public class FicheGroupeEditController {
 
 		/* valeures par defaut de l'onglet titre */
 		annulerTitre();
+
+		/* limite le textfiel à X caractères */
+		tf_titre.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_titre.getText() != null
+						&& newValue.length() > MainApp.getInstance().VALMAX + MainApp.getInstance().VALMAX) {
+					tf_titre.setText(oldValue);
+				} else {
+					tf_titre.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_genre_titre.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_genre_titre.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_genre_titre.setText(oldValue);
+				} else {
+					tf_genre_titre.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_auteur_titre.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_auteur_titre.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_auteur_titre.setText(oldValue);
+				} else {
+					tf_auteur_titre.setText(newValue);
+				}
+			}
+		});
 
 		/*
 		 * formatte le textfield pour qu'il accepte uniquement quatre chiffres
@@ -194,46 +336,19 @@ public class FicheGroupeEditController {
 		});
 		tf_annee_titre.positionCaret(tf_annee_titre.getLength());
 
-		btn_creer_groupe.setDisable(true);
-		btn_creer_membre.setDisable(true);
-		btn_supp_membre.setDisable(true);
-		btn_creer_titre.setDisable(true);
-		btn_supp_titre.setDisable(true);
-		bt_import_img.setDisable(true);
-		bt_supp_img.setDisable(true);
-
-		if (MainViewController.getInstance().connectAdmin) {
-			btn_creer_groupe.setDisable(false);
-			btn_creer_membre.setDisable(false);
-			btn_supp_membre.setDisable(false);
-			btn_creer_titre.setDisable(false);
-			btn_supp_titre.setDisable(false);
-			bt_import_img.setDisable(false);
-			bt_supp_img.setDisable(false);
-		} else if (MainViewController.getInstance().connectUser) {
-			btn_creer_groupe.setDisable(false);
-			btn_creer_membre.setDisable(false);
-			btn_creer_titre.setDisable(false);
-		}
-
+		// EVENEMENTS FUTURS ===============================================
 		/* formatte le tableau d'événement futurs */
 		col_event_event_f.setCellValueFactory(cellData -> cellData.getValue().nom_rencProperty());
 		col_ville_event_f.setCellValueFactory(cellData -> cellData.getValue().ville_rencProperty());
 		col_deb_event_f.setCellValueFactory(cellData -> cellData.getValue().date_deb_rencProperty());
 		col_fin_event_f.setCellValueFactory(cellData -> cellData.getValue().date_fin_rencProperty());
 
+		// EVENEMENTS PASSES ===============================================
 		/* formatte le tableau d'événement passés */
 		col_event_event_p.setCellValueFactory(cellData -> cellData.getValue().nom_rencProperty());
 		col_ville_event_p.setCellValueFactory(cellData -> cellData.getValue().ville_rencProperty());
 		col_deb_event_p.setCellValueFactory(cellData -> cellData.getValue().date_deb_rencProperty());
 		col_fin_event_p.setCellValueFactory(cellData -> cellData.getValue().date_fin_rencProperty());
-
-		vide1 = new Label(Lang_bundle.getString("vide"));
-		vide2 = new Label(Lang_bundle.getString("vide"));
-		vide3 = new Label(Lang_bundle.getString("vide"));
-		tbv_titre.setPlaceholder(vide1);
-		tbv_event_f.setPlaceholder(vide2);
-		tbv_event_p.setPlaceholder(vide3);
 	}
 
 	/**

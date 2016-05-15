@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import controller.MainApp;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -162,6 +163,9 @@ public class Rencontre implements Serializable, ObjectInputValidation {
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
 		} else if (this.ville_renc == null || this.ville_renc.length() == 0) {
 			throw new InvalidObjectException("Le champ ville ne doit pas être vide");
+		} else if (this.date_deb_renc.after(this.date_fin_renc) || this.date_deb_renc.equals(this.date_fin_renc)) {
+			throw new InvalidObjectException(
+					MainApp.getInstance().Lang_bundle.getString("La.date.de.debut.doit.etre.avant.la.date.de.fin"));
 		}
 	}
 }

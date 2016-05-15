@@ -99,6 +99,8 @@ public class Titre implements Serializable, ObjectInputValidation {
 			throw new InvalidObjectException("Le champ titre ne doit pas être vide");
 		} else if (this.duree == null) {
 			throw new InvalidObjectException("Le champ durée ne doit pas être vide");
+		} else if (this.reprise_titre && this.auteur.length() == 0) {
+			throw new InvalidObjectException("Veuillez entrer un nom d'auteur\nou cochez la case reprise");
 		}
 	}
 }

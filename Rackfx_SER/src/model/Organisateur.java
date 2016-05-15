@@ -97,6 +97,8 @@ public class Organisateur implements Serializable, ObjectInputValidation {
 			throw new InvalidObjectException("Le champ prenom ne doit pas être vide");
 		} else if (this.tel_orga == null || this.tel_orga.length() == 0) {
 			throw new InvalidObjectException("Le champ telephone ne doit pas être vide");
+		} else if (mail_orga.length() != 0 && (!this.mail_orga.contains("@") || !this.mail_orga.contains("."))) {
+			throw new InvalidObjectException("Adresse mail invalide");
 		}
 	}
 }

@@ -30,6 +30,7 @@ public final class MainApp extends Application {
 	protected ObservableList<Parametres> parametresData = FXCollections.observableArrayList();
 	protected final LocalTime def_time = LocalTime.of(0, 0);
 	public ResourceBundle Lang_bundle;
+	public final int VALMAX = 50;
 
 	/* Singleton */
 	/** Instance unique pré-initialisée */

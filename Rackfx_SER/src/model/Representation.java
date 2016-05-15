@@ -5,6 +5,7 @@ import java.io.ObjectInputValidation;
 import java.io.Serializable;
 import java.sql.Time;
 
+import controller.MainApp;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -89,6 +90,9 @@ public class Representation implements Serializable, ObjectInputValidation {
 			throw new InvalidObjectException("Le champ groupe ne doit pas être vide");
 		} else if (this.nom_titre == null || this.nom_titre.length() == 0) {
 			throw new InvalidObjectException("Le champ titre ne doit pas être vide");
+		} else if (this.heure_debut.after(this.heure_fin) || this.heure_debut.equals(this.heure_fin)) {
+			throw new InvalidObjectException(
+					MainApp.getInstance().Lang_bundle.getString("L'heure.de.debut.doit.etre.avant.l'heure.de.fin"));
 		}
 	}
 }

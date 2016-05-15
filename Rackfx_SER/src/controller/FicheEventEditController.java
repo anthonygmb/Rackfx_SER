@@ -34,7 +34,6 @@ import model.Titre;
 import utilities.Crud;
 import utilities.Res_listes;
 import utilities.Validateur;
-import utilities.ValidateurExeption;
 
 public class FicheEventEditController {
 
@@ -68,6 +67,42 @@ public class FicheEventEditController {
 	private void initialize() {
 		INSTANCE_FICHE_EVENT_CONTROLLER = this;
 		this.Lang_bundle = MainApp.getInstance().Lang_bundle;
+
+		/* limite le textfiel à X caractères */
+		tf_nom_event.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_nom_event.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_nom_event.setText(oldValue);
+				} else {
+					tf_nom_event.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_ville_event.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_ville_event.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_ville_event.setText(oldValue);
+				} else {
+					tf_ville_event.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_lieu_event.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_lieu_event.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_lieu_event.setText(oldValue);
+				} else {
+					tf_lieu_event.setText(newValue);
+				}
+			}
+		});
 
 		cmbox_orga.setButtonCell(new ListCell<Organisateur>() {
 			@Override
@@ -115,6 +150,67 @@ public class FicheEventEditController {
 			}
 		});
 		tf_nb_pers_event.positionCaret(tf_nb_pers_event.getLength());
+
+		/* limite le textfiel à X caractères */
+		tf_nom_orga.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_nom_orga.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_nom_orga.setText(oldValue);
+				} else {
+					tf_nom_orga.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_prenom_orga.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_prenom_orga.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_prenom_orga.setText(oldValue);
+				} else {
+					tf_prenom_orga.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_entreprise_orga.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_entreprise_orga.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_entreprise_orga.setText(oldValue);
+				} else {
+					tf_entreprise_orga.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_adress_orga.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_adress_orga.getText() != null
+						&& newValue.length() > MainApp.getInstance().VALMAX + MainApp.getInstance().VALMAX) {
+					tf_adress_orga.setText(oldValue);
+				} else {
+					tf_adress_orga.setText(newValue);
+				}
+			}
+		});
+
+		/* limite le textfiel à X caractères */
+		tf_mail_orga.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_mail_orga.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_mail_orga.setText(oldValue);
+				} else {
+					tf_mail_orga.setText(newValue);
+				}
+			}
+		});
 
 		tf_tel_orga.textProperty().addListener(new ChangeListener<String>() {
 			@Override
@@ -352,7 +448,6 @@ public class FicheEventEditController {
 		}
 		try {
 			rencontre.validateObject();
-			Validateur.valideDate(dt_debut_event.getValue(), dt_fin_event.getValue());
 			if (dialogStage.getTitle().equals(Lang_bundle.getString("Nouvelle.rencontre"))) {
 				geleTab(true);
 				MainViewController.getInstance().tv_planif.getItems().add(rencontre);
@@ -373,9 +468,6 @@ public class FicheEventEditController {
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ValidateurExeption e) {
-			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
-					e.getMessage()).showAndWait();
 		}
 	}
 
@@ -651,7 +743,6 @@ public class FicheEventEditController {
 			Groupe tempGroupe = MainViewController.getInstance().tv_reper.getItems()
 					.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex());
 			representation.validateObject();
-			Validateur.valideTime(ltp_h_deb_prog.getLocalTime(), ltp_h_fin_prog.getLocalTime());
 
 			if (tbv_prog.getSelectionModel().getSelectedItem() == null) {
 				rencontre.addRepresentationToList(representation);
@@ -670,7 +761,7 @@ public class FicheEventEditController {
 
 				MainViewController.getInstance().tv_reper.getItems()
 						.get(cmbox_groupe_event.getSelectionModel().getSelectedIndex())
-						.setRepresentationToList(index2, representation);// TODO
+						.setRepresentationToList(index2, representation);
 
 				tbv_prog.getItems().set(tbv_prog.getSelectionModel().getSelectedIndex(), representation);
 			}
@@ -688,9 +779,6 @@ public class FicheEventEditController {
 					e.getMessage()).showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ValidateurExeption e) {
-			Validateur.showPopup(AlertType.WARNING, Lang_bundle.getString("Erreur"), Lang_bundle.getString("Attention"),
-					e.getMessage()).showAndWait();
 		}
 	}
 

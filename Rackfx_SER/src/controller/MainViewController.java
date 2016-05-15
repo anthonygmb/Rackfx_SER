@@ -12,6 +12,8 @@ import java.util.ResourceBundle;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -190,6 +192,18 @@ public final class MainViewController {
 		tv_reper.setPlaceholder(vide1);
 		tv_planif.setPlaceholder(vide2);
 		tv_admin.setPlaceholder(vide3);
+		
+		/* limite le textfiel à X caractères */
+		tf_admin_login.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (tf_admin_login.getText() != null && newValue.length() > MainApp.getInstance().VALMAX) {
+					tf_admin_login.setText(oldValue);
+				} else {
+					tf_admin_login.setText(newValue);
+				}
+			}
+		});
 	}
 
 	/*
@@ -579,22 +593,14 @@ public final class MainViewController {
 			lb_region_groupe.setText(groupe.getRegion_groupe());
 			lb_nb_membre.setText(String.valueOf(groupe.getListe_personne().size()));
 			lb_nb_titre.setText(String.valueOf(groupe.getListe_titre().size()));
-			
-			System.out.printf("showGroupeDetails : %d\n", groupe.getListe_representation().size());//TODO
-			
-//			for (Representation repreTri : groupe.getListe_representation()) {
-				for (Rencontre rencontre : tv_planif.getItems()) {
-					for (Representation repre : rencontre.getListe_representation()) {
-						for (Representation repreTri : groupe.getListe_representation()) {
-						if (repreTri.getNom_Groupe().equals(repre.getNom_Groupe())) {
-							rencontreDataTri.add(rencontre);
-						}
-						}
+
+			for (Rencontre rencontre : tv_planif.getItems()) {
+				for (Representation repre : rencontre.getListe_representation()) {
+					if (groupe.getNom_groupe().equals(repre.getNom_Groupe())) {
+						rencontreDataTri.add(rencontre);
 					}
 				}
-//			}
-			
-			System.out.printf("rencontreDataTri : %d\n", rencontreDataTri.size());//TODO
+			}
 
 			for (Rencontre rencTri : rencontreDataTri) {
 				if (rencTri.getDate_fin_renc().getTime() > auj.getTime()) {

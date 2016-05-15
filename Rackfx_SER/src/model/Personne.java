@@ -5,6 +5,8 @@ import java.io.ObjectInputValidation;
 import java.io.Serializable;
 import java.sql.Date;
 
+import controller.FicheGroupeEditController;
+
 public class Personne extends Groupe implements Serializable, ObjectInputValidation {
 
 	private static final long serialVersionUID = -7815741770942733167L;
@@ -136,6 +138,13 @@ public class Personne extends Groupe implements Serializable, ObjectInputValidat
 			throw new InvalidObjectException("Le champ nom ne doit pas être vide");
 		} else if (this.prenom_membre == null || this.prenom_membre.length() == 0) {
 			throw new InvalidObjectException("Le champ prenom ne doit pas être vide");
+		} else if (this.date_naiss_membre.after(FicheGroupeEditController.getInstance().auj)) {
+			throw new InvalidObjectException("La date de naissance doit être dans le passé");
+		} else if (correspondant && mail_cor.length() != 0
+				&& (!this.mail_cor.contains("@") || !this.mail_cor.contains("."))) {
+			throw new InvalidObjectException("Adresse mail invalide");
+		} else if (correspondant && this.tel_cor == null) {
+			throw new InvalidObjectException("Le champ téléphone ne doit pas être vide");
 		}
 	}
 }
