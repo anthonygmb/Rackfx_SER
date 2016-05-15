@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -37,7 +35,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import model.Groupe;
 import model.Organisateur;
 import model.Parametres;
@@ -364,133 +361,92 @@ public final class MainViewController {
 	@FXML
 	private void searchBar() {
 		vb_link.getChildren().clear();
+		try {
+			if (!cst_tf_search.getText().equals("")) {
+				for (Groupe groupe : tv_reper.getItems()) {
+					if (cst_tf_search.getText().toLowerCase().equals(
+							groupe.getNom_groupe().toLowerCase().substring(0, cst_tf_search.getText().length()))) {
+						Label ctgr_groupe = new Label(Lang_bundle.getString("Ctgr.groupe"));
+						vb_link.getChildren().add(ctgr_groupe);
+						Hyperlink link_groupe = new Hyperlink(groupe.getNom_groupe());
+						link_groupe.setOnAction(new EventHandler<ActionEvent>() {
 
-		HashMap<Integer, Groupe> result1 = new HashMap<>();
-//		HashMap<Integer, Personne> result2 = new HashMap<>();
-//		HashMap<Integer, Titre> result3 = new HashMap<>();
-		HashMap<Integer, Rencontre> result2 = new HashMap<>();
-//		HashMap<Integer, Organisateur> result5 = new HashMap<>();
-
-		if (!cst_tf_search.getText().equals("")) {
-
-			for (Groupe groupe : tv_reper.getItems()) {
-				if (cst_tf_search.getText().equals(groupe.getNom_groupe())) {
-					result1.put(0, groupe);
-				}
-				for (Personne personne : groupe.getListe_personne()) {
-					if (cst_tf_search.getText().equals(personne.getNom_membre())) {
-						result1.put(1, groupe);
+							@Override
+							public void handle(ActionEvent event) {
+								MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 0);
+							}
+						});
+						vb_link.getChildren().add(link_groupe);
 					}
-				}
-				for (Titre titre : groupe.getListe_titre()) {
-					if (cst_tf_search.getText().equals(titre.getTitre())) {
-						result1.put(2, groupe);
-					}
-				}
-			}
+					for (Personne personne : groupe.getListe_personne()) {
+						if (cst_tf_search.getText().toLowerCase().equals(personne.getNom_membre().toLowerCase()
+								.substring(0, cst_tf_search.getText().length()))) {
+							Label ctgr_personne = new Label(Lang_bundle.getString("Ctgr.personne"));
+							vb_link.getChildren().add(ctgr_personne);
+							Hyperlink link_personne = new Hyperlink(personne.getNom_membre());
+							link_personne.setOnAction(new EventHandler<ActionEvent>() {
 
-			for (Rencontre rencontre : tv_planif.getItems()) {
-				if (cst_tf_search.getText().equals(rencontre.getNom_renc())) {
-					result2.put(0, rencontre);
-				}
-				for (Organisateur organisateur : rencontre.getListe_organisateur()) {
-					if (cst_tf_search.getText().equals(organisateur.getNom_orga())) {
-						result2.put(1, rencontre);
-					}
-				}
-			}
-
-			if (!result1.isEmpty()) {
-				for (int i = 0; i < result1.size(); i++) {
-					if (result1.get())) {
-						
-					}
-				}
-				
-				
-				Label ctgr_groupe = new Label(Lang_bundle.getString("Ctgr.groupe"));
-				vb_link.getChildren().add(ctgr_groupe);
-//				for (Groupe groupe : result1) {
-					Hyperlink link_groupe = new Hyperlink(groupe.getNom_groupe());
-					link_groupe.setOnAction(new EventHandler<ActionEvent>() {
-
-						@Override
-						public void handle(ActionEvent event) {
-							MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 0);
+								@Override
+								public void handle(ActionEvent event) {
+									MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 1);
+								}
+							});
+							vb_link.getChildren().add(link_personne);
 						}
-					});
-					vb_link.getChildren().add(link_groupe);
-//				}
-			}
-			if (!result2.isEmpty()) {
-				Line ligne = new Line(0, 0, 588, 0);
-				Label ctgr_personne = new Label(Lang_bundle.getString("Ctgr.personne"));
-				vb_link.getChildren().add(ligne);
-				vb_link.getChildren().add(ctgr_personne);
-				for (Personne personne : result2) {
-					Hyperlink link_personne = new Hyperlink(personne.getNom_membre());
-					link_personne.setOnAction(new EventHandler<ActionEvent>() {
+					}
+					for (Titre titre : groupe.getListe_titre()) {
+						if (cst_tf_search.getText().toLowerCase().equals(
+								titre.getTitre().toLowerCase().substring(0, cst_tf_search.getText().length()))) {
+							Label ctgr_titre = new Label(Lang_bundle.getString("Ctgr.titre"));
+							vb_link.getChildren().add(ctgr_titre);
+							Hyperlink link_titre = new Hyperlink(titre.getTitre());
+							link_titre.setOnAction(new EventHandler<ActionEvent>() {
 
-						@Override
-						public void handle(ActionEvent event) {
-							MainApp.getInstance().showFicheGroupeEditDialog(personne.getGroupe(), true, 1);// TODO
+								@Override
+								public void handle(ActionEvent event) {
+									MainApp.getInstance().showFicheGroupeEditDialog(groupe, true, 2);
+								}
+							});
+							vb_link.getChildren().add(link_titre);
 						}
-					});
-					vb_link.getChildren().add(link_personne);
+					}
+				}
+
+				for (Rencontre rencontre : tv_planif.getItems()) {
+					if (cst_tf_search.getText().toLowerCase().equals(
+							rencontre.getNom_renc().toLowerCase().substring(0, cst_tf_search.getText().length()))) {
+						Label ctgr_rencontre = new Label(Lang_bundle.getString("Ctgr.rencontre"));
+						vb_link.getChildren().add(ctgr_rencontre);
+						Hyperlink link_rencontre = new Hyperlink(rencontre.getNom_renc());
+						link_rencontre.setOnAction(new EventHandler<ActionEvent>() {
+
+							@Override
+							public void handle(ActionEvent event) {
+								MainApp.getInstance().showFicheEventEditDialog(rencontre, true, 0);
+							}
+						});
+						vb_link.getChildren().add(link_rencontre);
+					}
+					for (Organisateur organisateur : rencontre.getListe_organisateur()) {
+						if (cst_tf_search.getText().toLowerCase().equals(organisateur.getNom_orga().toLowerCase()
+								.substring(0, cst_tf_search.getText().length()))) {
+							Label ctgr_organisateur = new Label(Lang_bundle.getString("Ctgr.organisateur"));
+							vb_link.getChildren().add(ctgr_organisateur);
+							Hyperlink link_organisateur = new Hyperlink(organisateur.getNom_orga());
+							link_organisateur.setOnAction(new EventHandler<ActionEvent>() {
+
+								@Override
+								public void handle(ActionEvent event) {
+									MainApp.getInstance().showFicheEventEditDialog(rencontre, true, 1);
+								}
+							});
+							vb_link.getChildren().add(link_organisateur);
+						}
+					}
 				}
 			}
-//			if (!result3.isEmpty()) {
-//				Line ligne = new Line(0, 0, 588, 0);
-//				Label ctgr_titre = new Label(Lang_bundle.getString("Ctgr.titre"));
-//				vb_link.getChildren().add(ligne);
-//				vb_link.getChildren().add(ctgr_titre);
-//				for (Titre titre : result3) {
-//					Hyperlink link_titre = new Hyperlink(titre.getTitre());
-//					link_titre.setOnAction(new EventHandler<ActionEvent>() {
-//
-//						@Override
-//						public void handle(ActionEvent event) {
-//							MainApp.getInstance().showFicheGroupeEditDialog(titre.getGroupe(), true, 2);// TODO
-//						}
-//					});
-//					vb_link.getChildren().add(link_titre);
-//				}
-//			}
-//			if (!result4.isEmpty()) {
-//				Line ligne = new Line(0, 0, 588, 0);
-//				Label ctgr_rencontre = new Label(Lang_bundle.getString("Ctgr.rencontre"));
-//				vb_link.getChildren().add(ligne);
-//				vb_link.getChildren().add(ctgr_rencontre);
-//				for (Rencontre rencontre : result4) {
-//					Hyperlink link_rencontre = new Hyperlink(rencontre.getNom_renc());
-//					link_rencontre.setOnAction(new EventHandler<ActionEvent>() {
-//
-//						@Override
-//						public void handle(ActionEvent event) {
-//							MainApp.getInstance().showFicheEventEditDialog(rencontre, true, 0);
-//						}
-//					});
-//					vb_link.getChildren().add(link_rencontre);
-//				}
-//
-//			}
-//			if (!result5.isEmpty()) {
-//				Line ligne = new Line(0, 0, 588, 0);
-//				Label ctgr_organisateur = new Label(Lang_bundle.getString("Ctgr.organisateur"));
-//				vb_link.getChildren().add(ligne);
-//				vb_link.getChildren().add(ctgr_organisateur);
-//				for (Organisateur organisateur : result5) {
-//					Hyperlink link_organisateur = new Hyperlink(organisateur.getNom_orga());
-//					link_organisateur.setOnAction(new EventHandler<ActionEvent>() {
-//
-//						@Override
-//						public void handle(ActionEvent event) {
-//							MainApp.getInstance().showFicheEventEditDialog(organisateur.getRencontre(), true, 1);// TODO
-//						}
-//					});
-//					vb_link.getChildren().add(link_organisateur);
-//				}
-//			}
+		} catch (StringIndexOutOfBoundsException e) {
+			// TODO: handle exception
 		}
 	}
 
